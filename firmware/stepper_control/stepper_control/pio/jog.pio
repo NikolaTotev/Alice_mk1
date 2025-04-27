@@ -1,116 +1,165 @@
-.program stepper
+.program jog
 
 .define PUBLIC STEP_PIN_SHIFT 0       ; Position of the first step pin
+.define LOOP_COUNT 30*31
+    ; pull block
+    ; out y, 32
+ jmp start
 
-; Program starts here - blocks waiting for timing info from FIFO
 start:
-    pull block               ; Pull LOW time and direction
-    mov x, osr              ; Store LOW time value in x
-    jmp x_not_zero, setup   ; If LOW time isn't zero, go to setup
-    jmp start               ; If LOW time is zero, wait for new value
+    pull block           ; Pull LOW time and direction    
+    ; mov y, osr
+    ; mov x, y              ; Store LOW time value in OSR
+    set pins, 1
+    jmp !X setup            ; If LOW time isn't zero, continue to setup
+    ; jmp start               ; If LOW time is zero, wait for new value
 
 setup:
     ; Set direction pin based on value in OSR
-    out pins, 1             ; Output direction bit to pins
-    set pins, 0             ; Ensure step pin is low initially
-
-    ; Wait ~10us for direction change to settle (assuming 125MHz system clock)
-    ; 10us = 1250 cycles, so we'll use ~1250 cycles delay
-    mov y, 156              ; 156 * 8 cycles = ~1248 cycles
-direction_delay:
-    jmp y--, direction_delay ; Delay loop
+    set pins, 0 
+    jmp step_loop
 
 step_loop:
     ; STEP PULSE HIGH PHASE - fixed 7.5µs
     set pins, 1             ; Set step pin high
     
-    ; Create a delay for exactly 7.5us high time (at 125MHz, 1 cycle = 8ns)
-    ; 7.5us = 937.5 cycles, rounded up to 938 cycles
-    mov y, 117              ; 117 * 8 cycles = 936 cycles + 2 overhead = 938 cycles
-pulse_high_delay:
-    jmp y--, pulse_high_delay ; Loop for precise high time
+    ; Create delay for high pulse using nested loops
+    set y, 31               ; Max immediate for outer loop
+    set x, 30               ; Value for inner loop
+    jmp high_pulse_delay
 
+high_pulse_delay:
+    set x, 1 [30]
+    jmp y-- high_pulse_delay ; Decrement outer counter and loop if not zero
+    jmp high_pulse_done      ; Exit when both loops complete
+
+; high_pulse_inner:
+;     ; set pins 0 [10]
+;     ; set pins 1 [10]
+;     jmp x-- high_pulse_inner ; Just burn cycles
+;     set x, 30               ; Value for inner loop
+;     jmp high_pulse_delay     ; Return to outer loop
+
+high_pulse_done:
+    
     ; STEP PULSE LOW PHASE - variable time from FIFO
     set pins, 0             ; Set step pin low
+    out y, 32
+    mov x, y  
 
     ; Check for new LOW time value from FIFO (non-blocking)
     pull noblock            ; Try to pull a new value
-    mov y, osr              ; Store pulled value in y
-    jmp !osre, check_new    ; If we got a value, check it
-    jmp low_delay           ; Otherwise, continue with current timing
+    jmp !OSRE check_new     ; If FIFO had data (OSR not empty), check it
+    jmp delay_loop           ; Otherwise, continue with current timing
 
 check_new:
-    mov osr, y              ; Move the potentially new value to OSR
-    mov y, x                ; Get current LOW time for comparison
-    jmp x_not_y, update_delay ; If different, update the delay
-    jmp low_delay           ; Otherwise, continue with same timing
-
-update_delay:
-    mov x, osr              ; Store new LOW time in x
-    jmp x_not_zero, low_delay ; If LOW time isn't zero, continue stepping
-    jmp start               ; If LOW time is zero, go back to start and wait
-
-low_delay:
-    ; Delay for the LOW time specified by FIFO value in x
-    ; We need to account for the overhead of instructions between setting pin low
-    ; and starting this delay, plus the overhead of checking FIFO, etc.
-    ; Estimate ~20 cycles of overhead
-    mov y, x                ; Copy LOW time value to y for countdown
-    sub y, 20               ; Subtract instruction overhead from the delay
+    mov y, osr
+    jmp x!=y check_zero
     
+check_zero:
+    mov y, osr              ; Store pulled value directly into X
+    jmp !y start            ; If new time is zero, go back to start
+    jmp delay_loop
+
 delay_loop:
-    jmp y--, delay_loop     ; Delay loop for LOW time
+    jmp x-- delay_loop      ; Delay loop for LOW time
     
     ; Go to next step
     jmp step_loop           ; Next step
 
-x_not_zero:
-    jmp x!=0, ret           ; Jump if x != 0
-    jmp start               ; If x==0, go back to start
-    ret:                    ; Return from subroutine
+; .wrap_target
+;     set pins, 0   ; Turn LED on
+;     mov x, y
+; lp1:
+;     jmp x-- lp1   ; Delay for (x + 1) cycles, x is a 32 bit number
+;     mov x, y
+;     set pins, 0   ; Turn LED off
+; lp2:
+;     jmp x-- lp2   ; Delay for the same number of cycles again
+; .wrap             ; Blink forever!
 
-x_not_y:
-    jmp x!=y, ret2          ; Jump if x != y
-    jmp low_delay           ; If x==y, go back to low_delay
-    ret2:                   ; Return from subroutine
+
+; .program jog
+
+
+; ; Program starts here - blocks waiting for timing info from FIFO
+
+
+; setup:
+;     ; Set direction pin based on value in OSR
+;     set pins, 0             ; Ensure step pin is low initially
+
+; ; direction_delay:
+; ;     jmp y-- direction_loop  ; Outer loop 31 times
+; ;     jmp step_loop           ; Then proceed to stepping
+
+; ; direction_loop:
+; ;     jmp x-- direction_loop  ; Inner loop 30 times per outer loop
+; ;     set x, 30               ; Reset inner loop counter
+; ;     jmp direction_delay     ; Continue outer loop
+
+; step_loop:
+;     ; STEP PULSE HIGH PHASE - fixed 7.5µs
+;     set pins, 1             ; Set step pin high
+    
+;     ; Create delay for high pulse using nested loops
+;     set y, 31               ; Max immediate for outer loop
+;     set x, 30               ; Value for inner loop
+
+; high_pulse_delay:
+;     jmp x-- high_pulse_inner ; Run inner loop
+;     jmp y-- high_pulse_delay ; Decrement outer counter and loop if not zero
+;     jmp high_pulse_done      ; Exit when both loops complete
+
+; high_pulse_inner:
+;     jmp x-- high_pulse_inner ; Just burn cycles
+;     jmp high_pulse_delay     ; Return to outer loop
+
+; high_pulse_done:
+    
+;     ; STEP PULSE LOW PHASE - variable time from FIFO
+;     set pins, 0             ; Set step pin low
+
+;     ; Check for new LOW time value from FIFO (non-blocking)
+;     pull noblock            ; Try to pull a new value
+;     jmp !OSRE check_new     ; If FIFO had data (OSR not empty), check it
+;     jmp delay_loop           ; Otherwise, continue with current timing
+
+; check_new:
+;     mov x, osr              ; Store pulled value directly into X
+;     jmp !x start            ; If new time is zero, go back to start
+;                             ; Otherwise, fall through to low_delay
+
+; delay_loop:
+;     jmp x-- delay_loop      ; Delay loop for LOW time
+    
+;     ; Go to next step
+;     jmp step_loop           ; Next step
 
 % c-sdk {
 #include "hardware/clocks.h"
 
-static inline void stepper_program_init(PIO pio, uint sm, uint offset, uint step_pin, uint dir_pin, float div) {
+void jog_program_init(PIO pio, uint sm, uint offset, uint step_pin, float div) {
+    // Set the GPIO functions for pins
+    pio_gpio_init(pio, step_pin);
+
+    // Set the pins as outputs
+    pio_sm_set_consecutive_pindirs(pio, sm, step_pin, 1, true);
+    
+
     // Configure the state machine
-    pio_sm_config c = stepper_program_get_default_config(offset);
+    pio_sm_config c = jog_program_get_default_config(offset);
     
     // Map the SET pin group to the step pin
     sm_config_set_set_pins(&c, step_pin, 1);
-    
-    // Map the OUT pin group to the direction pin
-    sm_config_set_out_pins(&c, dir_pin, 1);
-    
-    // Set the GPIO functions for pins
-    pio_gpio_init(pio, step_pin);
-    pio_gpio_init(pio, dir_pin);
-    
-    // Set the pins as outputs
-    pio_sm_set_consecutive_pindirs(pio, sm, step_pin, 1, true);
-    pio_sm_set_consecutive_pindirs(pio, sm, dir_pin, 1, true);
-    
+        
     // Set the clock divider
     sm_config_set_clkdiv(&c, div);
     
     // Load the configuration and jump to start of the program
     pio_sm_init(pio, sm, offset, &c);
-    
-    // Enable the state machine
-    pio_sm_set_enabled(pio, sm, true);
+
 }
 
-// Helper function to convert us delay to PIO cycles
-static inline uint32_t stepper_delay_us_to_cycles(PIO pio, uint sm, float delay_us) {
-    // Calculate system clock frequency divided by state machine clock divider
-    float freq = clock_get_hz(clk_sys) / pio_sm_get_clkdiv(pio, sm);
-    
-    // Convert microseconds to cycles
-    return (uint32_t)(delay_us * freq / 1000000.0f);
-}
+
 %}

@@ -12,10 +12,12 @@ int main() {
     
     // Small delay to allow connections to establish
     sleep_ms(500);
-    
+
     // Initialize subsystems
     SerialHandler::init();
     MotionControl::init();
+
+ 
     
     // Print welcome message
     SerialHandler::printWelcomeMessage();
@@ -25,6 +27,7 @@ int main() {
     
     // Run Core 0 main function (never returns)
     CoreHandler::core0Main();
+    printf("s");
     
     return 0;
 }

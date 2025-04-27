@@ -78,7 +78,7 @@ void MotionControl::setMotorSpeed(int motor_id, int speed)
 // Jog function - implement your motor control logic here
 void MotionControl::start_jog(int speed, Direction direction)
 {
-    printf("Core 1: JOG function called with speed=%d, direction=%d\n", speed, direction);
+    //printf("Core 1: JOG function called with speed=%d, direction=%d\n", speed, direction);
 }
 
 // Jog function - implement your motor control logic here

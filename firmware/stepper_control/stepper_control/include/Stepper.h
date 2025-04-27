@@ -5,22 +5,32 @@
 #include "hardware/pio.h"
 #include "hardware/dma.h"
 
-class Stepper {
+class Stepper
+{
 public:
     // Configuration structure
-    struct Config {
-        PIO pio;                 // PIO instance to use
-        uint sm;                 // State machine number
-        uint step_pin;           // GPIO pin for step signal
-        uint dir_pin;            // GPIO pin for direction signal
-        float clk_div;           // PIO clock divider
+    struct Config
+    {
+        PIO pio;       // PIO instance to use
+        uint sm;       // State machine number
+        uint step_pin; // GPIO pin for step signal
+        uint dir_pin;  // GPIO pin for direction signal
+        uint driver_ena_pin;
+        uint shifter_ena_pin;
+        float clk_div; // PIO clock divider
     };
 
     // Constructor
     Stepper();
 
     // Initialize the stepper controller with configuration
-    void init(const Config& config);
+    void init(const Config &config);
+
+    void jogCW(uint32_t speed);
+
+    void jogCCW(uint32_t speed);
+
+    void stopJog();
 
     // Update speed (steps/second)
     void setSpeed(float speed);
@@ -46,23 +56,23 @@ public:
 private:
     // Hardware configuration
     Config config;
-    uint pio_offset;         // Offset of program in PIO memory
-    int dma_channel;         // DMA channel used
-    
+    uint pio_offset; // Offset of program in PIO memory
+    int dma_channel; // DMA channel used
+
     // DMA buffers for ping-pong operation
     uint32_t buffer_a[32];
     uint32_t buffer_b[32];
     bool use_buffer_a;       // Which buffer to use next
     volatile bool dma_ready; // Flag set by IRQ when DMA is ready
-    
+
     // Motion state
-    volatile uint32_t step_count;   // Total steps taken
-    bool direction;          // Current direction
-    float speed;             // Current speed in steps/second
-    uint32_t step_delay;     // Current delay value
+    volatile uint32_t step_count; // Total steps taken
+    bool direction;               // Current direction
+    float speed;                  // Current speed in steps/second
+    uint32_t step_delay;          // Current delay value
 
     // Helper method to setup DMA transfer
-    void setupDmaTransfer(uint32_t* buffer);
+    void setupDmaTransfer(uint32_t *buffer);
 
     // Static DMA interrupt handler
     static void dmaIrqHandler();

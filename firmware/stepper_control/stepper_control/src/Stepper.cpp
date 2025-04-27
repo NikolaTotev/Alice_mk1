@@ -3,6 +3,8 @@
 #include "hardware/dma.h"
 #include "hardware/clocks.h"
 #include <cmath>
+#include <jog.pio.h>
+#include <cstdio>
 
 // Static instance pointer for interrupt handler to access the correct instance
 static Stepper *active_instance = nullptr;
@@ -33,21 +35,41 @@ void Stepper::init(const Config &config)
     // Store the instance for the IRQ handler
     active_instance = this;
 
-    // Configure GPIO pins
+    // Configure GPIO pin for PIO
     gpio_set_function(config.step_pin, GPIO_FUNC_PIO0);
-    gpio_set_function(config.dir_pin, GPIO_OUT);
+
+    gpio_init(config.shifter_ena_pin);
+    gpio_set_dir(config.shifter_ena_pin, GPIO_OUT);
+    gpio_put(config.shifter_ena_pin, 1);
+
+    sleep_ms(5);
+
+    gpio_init(config.driver_ena_pin);
+    gpio_set_dir(config.driver_ena_pin, GPIO_OUT);
+    gpio_put(config.driver_ena_pin, 1);
+
+    sleep_ms(5);
 
     // Set initial direction
-    gpio_put(config.dir_pin, direction);
+    gpio_init(config.dir_pin);
+    gpio_set_dir(config.dir_pin, GPIO_OUT);
+    gpio_put(config.dir_pin, 1);
+
+    sleep_ms(100);
 
     // Load PIO program
-    pio_offset = pio_add_program(config.pio, &stepper_program);
+    pio_offset = pio_add_program(config.pio, &jog_program);
 
     // Initialize and configure PIO state machine
-    pio_sm_config sm_config = stepper_program_get_default_config(pio_offset);
-    sm_config_set_clkdiv(&sm_config, config.clk_div);
-    sm_config_set_out_pins(&sm_config, config.step_pin, 1);
-    pio_sm_init(config.pio, config.sm, pio_offset, &sm_config);
+    // pio_sm_config sm_config = jog_program_get_default_config(pio_offset);
+    // sm_config_set_clkdiv(&sm_config, config.clk_div);
+    // sm_config_set_out_pins(&sm_config, config.step_pin, 1);
+    // pio_sm_init(config.pio, config.sm, pio_offset, &sm_config);
+
+    jog_program_init(this->config.pio, this->config.sm, pio_offset, this->config.step_pin, this->config.clk_div);
+    // Start PIO state machine
+    pio_sm_set_enabled(this->config.pio, this->config.sm, true);
+    // this->config.pio->txf[this->config.sm] = 30000;
 
     // Claim DMA channel
     dma_channel = dma_claim_unused_channel(true);
@@ -57,11 +79,26 @@ void Stepper::init(const Config &config)
     irq_set_exclusive_handler(DMA_IRQ_0, dmaIrqHandler);
     irq_set_enabled(DMA_IRQ_0, true);
 
-    // Start PIO state machine
-    pio_sm_set_enabled(config.pio, config.sm, true);
-
     // Initialize with stopped motion
     setSpeed(0);
+}
+
+void Stepper::jogCW(uint32_t speed)
+{
+    printf("Starting jogging!");
+    gpio_put(config.dir_pin, 1);
+    pio_sm_put_blocking(this->config.pio, this->config.sm, speed - 3);
+}
+
+void Stepper::jogCCW(uint32_t speed)
+{
+    gpio_put(config.dir_pin, 1);
+    pio_sm_put_blocking(this->config.pio, this->config.sm, speed - 3);
+}
+
+void Stepper::stopJog()
+{
+    pio_sm_put_blocking(this->config.pio, this->config.sm, 0);
 }
 
 // Update speed (steps/second)
@@ -82,12 +119,12 @@ void Stepper::setSpeed(float new_speed)
     // Convert speed to delay value
     step_delay = speedToDelay(speed);
 
-    // Fill buffers with new delay value
-    for (int i = 0; i < 32; i++)
-    {
-        buffer_a[i] = step_delay;
-        buffer_b[i] = step_delay;
-    }
+    // // Fill buffers with new delay value
+    // for (int i = 0; i < 32; i++)
+    // {
+    //     buffer_a[i] = step_delay;
+    //     buffer_b[i] = step_delay;
+    // }
 }
 
 // Set direction (true = forward, false = backward)

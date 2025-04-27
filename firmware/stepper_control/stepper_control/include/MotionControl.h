@@ -1,11 +1,7 @@
 #ifndef MOTION_CONTROL_H
 #define MOTION_CONTROL_H
+#include <CommandProcessor.h>
 
-enum class Direction : uint8_t {
-    CW = 0,
-    CCW = 1,
-    // Add more commands here as needed
-};
 
 class MotionControl {
 public:

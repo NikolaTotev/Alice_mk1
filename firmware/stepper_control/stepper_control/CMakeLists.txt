@@ -42,6 +42,7 @@ set(CPP_SOURCES
     src/CoreHandler.cpp
     src/MotionControl.cpp
     src/SerialHandler.cpp
+    src/Stepper.cpp
 )
 
 # Add only the C++ executable
@@ -50,6 +51,11 @@ add_executable(stepper_control ${CPP_SOURCES})
 # Set program information
 pico_set_program_name(stepper_control "stepper_control")
 pico_set_program_version(stepper_control "0.1")
+
+# Generate PIO header
+pico_generate_pio_header(stepper_control ${CMAKE_CURRENT_LIST_DIR}/pio/jog.pio)
+pico_generate_pio_header(stepper_control ${CMAKE_CURRENT_LIST_DIR}/pio/test.pio)
+
 
 # Modify the below lines to enable/disable output over UART/USB
 pico_enable_stdio_uart(stepper_control 0)
@@ -60,6 +66,8 @@ target_link_libraries(stepper_control
     pico_stdlib
     pico_multicore  # Support for dual-core programming
     hardware_gpio   # GPIO access for motor control
+    hardware_pio
+    hardware_dma
 )
 
 # Add include directories
