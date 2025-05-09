@@ -48,9 +48,18 @@ void CoreHandler::core1Entry()
         // Process the command
         switch (cmd->cmd_type)
         {
-        case CommandType::JOG:
-            stepper.jogCW(cmd->speed/0.008);
-            MotionControl::start_jog(cmd->speed, cmd->direction);
+            printf("Direction IS=%d\n", cmd->direction);
+            case CommandType::JOG:
+            if(cmd->direction ==Direction::CW) {
+
+                stepper.jogCW(cmd->speed/0.008);
+                MotionControl::start_jog(cmd->speed, cmd->direction);
+            }
+            else{
+                stepper.jogCCW(cmd->speed/0.008);
+                MotionControl::start_jog(cmd->speed, cmd->direction);
+            }
+            
             break;
 
         case CommandType::TRACK:

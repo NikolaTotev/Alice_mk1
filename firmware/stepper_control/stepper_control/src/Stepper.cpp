@@ -92,7 +92,7 @@ void Stepper::jogCW(uint32_t speed)
 
 void Stepper::jogCCW(uint32_t speed)
 {
-    gpio_put(config.dir_pin, 1);
+    gpio_put(config.dir_pin, 0);
     pio_sm_put_blocking(this->config.pio, this->config.sm, speed - 3);
 }
 

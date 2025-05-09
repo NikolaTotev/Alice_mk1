@@ -1,0 +1,213 @@
+/**
+ * @file AS5048A_Example.ino
+ * @brief Example usage of the AS5048A library
+ * @date April 2025
+ * 
+ * This example shows how to use the AS5048A magnetic rotary encoder
+ * with an ESP32 C3 mini 1 module.
+ * 
+ * Connections:
+ * AS5048A   | ESP32 C3 mini 1
+ * ---------------------
+ * VDD3V     | 3.3V
+ * GND       | GND
+ * CLK       | SCK (GPIO6)
+ * MISO      | MISO (GPIO5)
+ * MOSI      | MOSI (GPIO4)
+ * CSn       | GPIO7 (or any available GPIO pin)
+ * PWM       | GPIO2 (optional)
+ */
+
+#include <SPI.h>
+#include "AS5048.h"
+#include <esp_now.h>
+#include <thread>
+#include <WiFi.h>
+
+
+uint8_t broadcast_address[]= {0x34 ,0x85 ,0x18 ,0xac ,0xc9 ,0x18};
+esp_now_peer_info_t  peerInfo;
+
+int in_cmd = 0;
+
+typedef struct message{
+  int joint_id;
+  float angle;
+} message;
+
+message send_angle;
+message incoming_command;
+
+// Define the CS pin for the AS5048A
+const int CS_PIN = 7;  // GPIO7 on ESP32 C3 mini 1
+
+// Create an AS5048A object
+AS5048A encoder(CS_PIN);
+
+
+
+void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t sendStatus) {
+  if(sendStatus ==0) {
+   Serial.println("Data sent!");
+  }
+  else{
+ Serial.println("Failed to send data");
+  }
+}
+
+void OnDataRecv(const esp_now_recv_info_t *mac, const uint8_t *incoming_data, int len) {
+  Serial.println("Data requested!");
+  memcpy(&incoming_command, incoming_data, sizeof(incoming_command));
+
+  float angleDegrees = encoder.readAngleDegrees();
+
+  send_angle.angle=angleDegrees;
+  send_angle.joint_id = incoming_command.joint_id;
+
+  esp_now_send(broadcast_address, (uint8_t*)&send_angle, sizeof(send_angle));
+}
+
+
+
+void printAngleReadings() {
+  // Read raw angle value (0-16383)
+  uint16_t rawAngle = encoder.readRawAngle();
+  
+  // Read angle in degrees (0-359.99)
+  float angleDegrees = encoder.readAngleDegrees();
+  
+  // Read angle in radians (0-2π)
+  float angleRadians = encoder.readAngleRadians();
+  
+  // Display values
+  Serial.print("Raw angle: ");
+  Serial.print(rawAngle);
+  Serial.print(" | Degrees: ");
+  Serial.print(angleDegrees, 2);  // 2 decimal places
+  Serial.print(" | Radians: ");
+  Serial.println(angleRadians, 4);  // 4 decimal places
+    
+  // Check for errors
+  if (encoder.hasError()) {
+    Serial.println("Err");
+    encoder.clearErrors();
+  }
+}
+
+void printDiagnostics() {
+  // Read diagnostic values
+  uint8_t diag = encoder.readDiagnostics();
+  uint8_t agc = encoder.readAGC();
+  uint16_t magnitude = encoder.readMagnitude();
+  
+  Serial.println("Diagnostics:");
+  Serial.print("  OCF (Offset Compensation Finished): ");
+  Serial.println((diag & encoder.DIAG_OCF) ? "Yes" : "No");
+  
+  Serial.print("  COF (CORDIC Overflow): ");
+  Serial.println((diag & encoder.DIAG_COF) ? "Yes (ERROR!)" : "No");
+  
+  Serial.print("  Magnetic Field: ");
+  if (diag & encoder.DIAG_COMP_HIGH) {
+    Serial.println("Too strong");
+  } else if (diag & encoder.DIAG_COMP_LOW) {
+    Serial.println("Too weak");
+  } else {
+    Serial.println("OK");
+  }
+  
+  Serial.print("  AGC Value: ");
+  Serial.print(agc);
+  Serial.println(" (0=strong field, 255=weak field)");
+  
+  Serial.print("  Magnitude: ");
+  Serial.println(magnitude);
+  Serial.println();
+}
+
+void setPermanentZero() {
+  Serial.println("WARNING: About to program PERMANENT zero position.");
+  Serial.println("This operation can only be performed ONCE on the chip!");
+  Serial.println("Are you sure? Type 'YES' to continue...");
+  
+  // Wait for input
+  while (!Serial.available()) {
+    delay(100);
+  }
+  
+  String input = Serial.readString();
+  input.trim();
+  
+  if (input == "YES") {
+    Serial.println("Programming permanent zero position...");
+    
+    if (encoder.programZeroPosition()) {
+      Serial.println("Zero position successfully programmed!");
+    } else {
+      Serial.println("Failed to program zero position!");
+    }
+  } else {
+    Serial.println("Operation cancelled.");
+  }
+}
+
+void setup() {
+  // Initialize serial communication
+  Serial.begin(115200);  
+  delay(1000);  // Wait for serial connection
+  Serial.println("Waiting 10 seconds for pin toggle...");
+  delay(10000);
+  Serial.println("Starting in 5 seconds...");
+  delay(5000);
+  Serial.print("Initializing encoder...");
+    
+  // Initialize the encoder
+  if (encoder.begin()) {
+    Serial.println("Encoder initialized successfully");
+  } else {
+    
+    while (1){
+      Serial.println("Failed to initialize encoder!");
+      delay(1000);
+    }  // Halt if initialization fails
+  }
+  
+  // Clear any previous errors
+  encoder.clearErrors();
+
+ 
+  // // Check magnetic field strength
+  // int fieldStatus = encoder.checkMagneticField();
+  // if (fieldStatus == 0) {
+  //   Serial.println("Magnetic field strength: OK");
+  // } else if (fieldStatus > 0) {
+  //   Serial.println("Warning: Magnetic field too strong");
+  // } else {
+  //   Serial.println("Warning: Magnetic field too weak");
+  // }
+  
+  // // Read automatic gain control value
+  // Serial.print("AGC value: ");
+  // Serial.println(encoder.readAGC());
+  
+  // // Read magnitude
+  // Serial.print("Magnitude: ");
+  // Serial.println(encoder.readMagnitude());
+  
+
+  
+  // Serial.println("\nAvailable commands:");
+  // Serial.println(" r - Read angle values");
+  // Serial.println(" z - Set current position as zero (temporary)");
+  // Serial.println(" p - Program current position as permanent zero (CAUTION!)");
+  // Serial.println(" d - Read diagnostic information");
+  // Serial.println(" c - Clear errors");
+  
+  // Serial.println("\nReading angle values...");
+}
+
+
+void loop() {  
+  printAngleReadings();
+  delay(500);
+}
