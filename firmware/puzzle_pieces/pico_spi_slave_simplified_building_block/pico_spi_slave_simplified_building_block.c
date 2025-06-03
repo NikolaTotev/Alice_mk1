@@ -100,8 +100,8 @@ int main()
         spi_read_blocking(spi0, 0xFF, (uint8_t *)&rx_data, sizeof(DataPacket));
 
         // Prepare response data
-        tx_data.num1 = response_counter;
-        tx_data.num2 = response_counter * 3;
+        tx_data.num1 = 2222;
+        tx_data.num2 = 2222;
 
         // // Then send response data back
         spi_write_blocking(spi0, (uint8_t *)&tx_data, sizeof(DataPacket));

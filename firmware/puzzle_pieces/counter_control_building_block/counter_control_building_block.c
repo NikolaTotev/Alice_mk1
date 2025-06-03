@@ -1,16 +1,14 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 
-#define clk_pin 16
-#define rst_pin 0
+#define clk_pin 0
+#define rst_pin 1
 #define led_pin 25
 
 int main()
 {
     int counter = 0;
-    stdio_init_all();
-
-    stdio_init_all();
+    stdio_init_all();    
 
     gpio_init(clk_pin);
     gpio_init(rst_pin);
@@ -39,7 +37,7 @@ int main()
 
     while (true)
     {
-        if (counter < 3)
+        if (counter <1)
         {
             printf("Incrementing, %d\n", counter);
             gpio_put(clk_pin, true);
@@ -60,6 +58,6 @@ int main()
             sleep_ms(1);
             counter = 0;
         }
-        sleep_ms(5);
+        sleep_ms(500);
     }
 }
