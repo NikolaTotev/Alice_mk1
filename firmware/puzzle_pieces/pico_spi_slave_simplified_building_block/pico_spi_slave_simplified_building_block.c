@@ -21,6 +21,12 @@ typedef struct
 #define SPI_FREQ 1000000 // 1 MHz
 #define LED_PIN 25
 
+// Frame format definitions (since they're not in the SDK)
+#define FRAME_FORMAT_MOTOROLA  0x0
+#define FRAME_FORMAT_TI        0x1
+#define FRAME_FORMAT_MICROWIRE 0x2
+
+
 // Global variables for interrupt handling
 volatile bool data_ready = false;
 DataPacket rx_data;
@@ -72,7 +78,19 @@ int main()
     spi_init(spi0, SPI_FREQ);
 
     // Set SPI format
-    spi_set_format(spi0, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
+    // spi_set_format(spi0, 8, SPI_CPOL_1, SPI_CPHA_0, SPI_MSB_FIRST);
+
+     spi_set_format(spi0, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
+
+    // Get hardware register access
+    spi_hw_t *hw = spi_get_hw(spi0);
+
+    // Set TI frame format (bits 5:4 = 01)
+    uint32_t cr0 = hw->cr0;
+    cr0 &= ~(0x3 << 4);            // Clear FRF field
+    cr0 |= (FRAME_FORMAT_TI << 4); // Set TI format
+    hw->cr0 = cr0;
+
 
     // Set SPI0 to slave mode
     spi_set_slave(spi0, true);
@@ -82,6 +100,11 @@ int main()
     gpio_set_function(SPI0_MOSI, GPIO_FUNC_SPI);
     gpio_set_function(SPI0_MISO, GPIO_FUNC_SPI);
     gpio_set_function(SPI0_CS, GPIO_FUNC_SPI);
+
+    gpio_set_drive_strength(SPI0_SCK, GPIO_DRIVE_STRENGTH_2MA);
+    gpio_set_drive_strength(SPI0_MOSI, GPIO_DRIVE_STRENGTH_2MA);
+    gpio_set_drive_strength(SPI0_MISO, GPIO_DRIVE_STRENGTH_2MA);
+    gpio_set_drive_strength(SPI0_CS, GPIO_DRIVE_STRENGTH_2MA);
 
     // Set up interrupt on CS pin
     // gpio_set_irq_enabled_with_callback(SPI0_CS, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE,
@@ -94,14 +117,14 @@ int main()
         // Check if CS is low (active)
         // if (!gpio_get(SPI0_CS))
         // {
-        printf("Waiting to read...");
+        printf("Waiting to read...\n");
         gpio_put(LED_PIN, true);
         // First, read incoming data from master
         spi_read_blocking(spi0, 0xFF, (uint8_t *)&rx_data, sizeof(DataPacket));
 
         // Prepare response data
-        tx_data.num1 = 2222;
-        tx_data.num2 = 2222;
+        tx_data.num1 = rx_data.num1;
+        tx_data.num2 = rx_data.num2;
 
         // // Then send response data back
         spi_write_blocking(spi0, (uint8_t *)&tx_data, sizeof(DataPacket));
@@ -116,8 +139,8 @@ int main()
         gpio_put(LED_PIN, false);
 
         // Process received data
-        printf("Received: num1=%lu, num2=%lu\n", rx_data.num1, rx_data.num2);
-        printf("Sent back: num1=%lu, num2=%lu\n\n", tx_data.num1, tx_data.num2);
+        printf("PICO 1 >> Received: num1=%lu, num2=%lu\n", rx_data.num1, rx_data.num2);
+        printf("PICO 1 >> Sent back: num1=%lu, num2=%lu\n\n", tx_data.num1, tx_data.num2);
 
         response_counter++;
         //}

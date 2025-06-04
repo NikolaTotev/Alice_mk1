@@ -23,6 +23,33 @@ typedef struct
 #define clk_pin 0
 #define rst_pin 1
 
+// Frame format definitions (since they're not in the SDK)
+#define FRAME_FORMAT_MOTOROLA 0x0
+#define FRAME_FORMAT_TI 0x1
+#define FRAME_FORMAT_MICROWIRE 0x2
+
+void print_spi_config()
+{
+    spi_hw_t *hw = spi_get_hw(spi1);
+    uint32_t frame_format = (hw->cr0 >> 4) & 0x3;
+
+    printf("Frame format: ");
+    switch (frame_format)
+    {
+    case FRAME_FORMAT_MOTOROLA:
+        printf("Motorola SPI\n");
+        break;
+    case FRAME_FORMAT_TI:
+        printf("TI Synchronous Serial\n");
+        break;
+    case FRAME_FORMAT_MICROWIRE:
+        printf("Microwire\n");
+        break;
+    default:
+        printf("Unknown (%lu)\n", frame_format);
+    }
+}
+
 int main()
 {
     int counter = 0;
@@ -32,15 +59,11 @@ int main()
     gpio_set_dir(LED_PIN, GPIO_OUT);
     gpio_put(LED_PIN, false);
 
-
-    
     gpio_init(clk_pin);
     gpio_init(rst_pin);
 
-
     gpio_set_dir(clk_pin, GPIO_OUT);
     gpio_set_dir(rst_pin, GPIO_OUT);
-
 
     gpio_put(clk_pin, false);
     gpio_put(rst_pin, false);
@@ -64,13 +87,31 @@ int main()
     spi_init(spi1, SPI_FREQ);
 
     // Set SPI format
+    // spi_set_format(spi1, 8, SPI_CPOL_1, SPI_CPHA_0, SPI_MSB_FIRST);
+
     spi_set_format(spi1, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
+
+    // Get hardware register access
+    spi_hw_t *hw = spi_get_hw(spi1);
+
+    // Set TI frame format (bits 5:4 = 01)
+    uint32_t cr0 = hw->cr0;
+    cr0 &= ~(0x3 << 4);            // Clear FRF field
+    cr0 |= (FRAME_FORMAT_TI << 4); // Set TI format
+    hw->cr0 = cr0;
+
+    print_spi_config();
 
     // Initialize SPI pins
     gpio_set_function(SPI1_SCK, GPIO_FUNC_SPI);
     gpio_set_function(SPI1_MOSI, GPIO_FUNC_SPI);
     gpio_set_function(SPI1_MISO, GPIO_FUNC_SPI);
     gpio_set_function(SPI1_CS, GPIO_FUNC_SPI);
+
+    gpio_set_drive_strength(SPI1_SCK, GPIO_DRIVE_STRENGTH_2MA);
+    gpio_set_drive_strength(SPI1_MOSI, GPIO_DRIVE_STRENGTH_2MA);
+    gpio_set_drive_strength(SPI1_MISO, GPIO_DRIVE_STRENGTH_2MA);
+    gpio_set_drive_strength(SPI1_CS, GPIO_DRIVE_STRENGTH_2MA);
 
     // Create data packet
     DataPacket tx_data;
@@ -152,7 +193,7 @@ int main()
             // Print received data
             printf("Received from pico 2: num1=%lu, num2=%lu\n\n", rx_data.num1, rx_data.num2);
 
-            printf("Counter is zero");
+            printf("Counter is zero\n");
             gpio_put(rst_pin, true);
             gpio_put(LED_PIN, true);
             sleep_ms(1);
