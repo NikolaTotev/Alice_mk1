@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "AZCwKgRtdJw=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\joystick_input_building_block\\joystick_input_building_block.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\NikolaT\\.nuget\\packages\\microsoft.windows.sdk.net.ref\\10.0.19041.57\\microsoft.windows.sdk.net.ref.10.0.19041.57.nupkg.sha512"
+  ],
+  "logs": []
+}

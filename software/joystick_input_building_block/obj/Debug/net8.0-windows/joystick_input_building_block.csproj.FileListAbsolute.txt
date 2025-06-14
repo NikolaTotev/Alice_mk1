@@ -1,0 +1,15 @@
+C:\Users\NikolaT\Documents\18_MSHRC\code\Alice_mk1\software\joystick_input_building_block\bin\Debug\net8.0-windows\joystick_input_building_block.exe
+C:\Users\NikolaT\Documents\18_MSHRC\code\Alice_mk1\software\joystick_input_building_block\bin\Debug\net8.0-windows\joystick_input_building_block.deps.json
+C:\Users\NikolaT\Documents\18_MSHRC\code\Alice_mk1\software\joystick_input_building_block\bin\Debug\net8.0-windows\joystick_input_building_block.runtimeconfig.json
+C:\Users\NikolaT\Documents\18_MSHRC\code\Alice_mk1\software\joystick_input_building_block\bin\Debug\net8.0-windows\joystick_input_building_block.dll
+C:\Users\NikolaT\Documents\18_MSHRC\code\Alice_mk1\software\joystick_input_building_block\bin\Debug\net8.0-windows\joystick_input_building_block.pdb
+C:\Users\NikolaT\Documents\18_MSHRC\code\Alice_mk1\software\joystick_input_building_block\obj\Debug\net8.0-windows\joystick_input_building_block.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\NikolaT\Documents\18_MSHRC\code\Alice_mk1\software\joystick_input_building_block\obj\Debug\net8.0-windows\joystick_input_building_block.AssemblyInfoInputs.cache
+C:\Users\NikolaT\Documents\18_MSHRC\code\Alice_mk1\software\joystick_input_building_block\obj\Debug\net8.0-windows\joystick_input_building_block.AssemblyInfo.cs
+C:\Users\NikolaT\Documents\18_MSHRC\code\Alice_mk1\software\joystick_input_building_block\obj\Debug\net8.0-windows\joystick_input_building_block.csproj.CoreCompileInputs.cache
+C:\Users\NikolaT\Documents\18_MSHRC\code\Alice_mk1\software\joystick_input_building_block\obj\Debug\net8.0-windows\joystick_input_building_block.sourcelink.json
+C:\Users\NikolaT\Documents\18_MSHRC\code\Alice_mk1\software\joystick_input_building_block\obj\Debug\net8.0-windows\joystick_input_building_block.dll
+C:\Users\NikolaT\Documents\18_MSHRC\code\Alice_mk1\software\joystick_input_building_block\obj\Debug\net8.0-windows\refint\joystick_input_building_block.dll
+C:\Users\NikolaT\Documents\18_MSHRC\code\Alice_mk1\software\joystick_input_building_block\obj\Debug\net8.0-windows\joystick_input_building_block.pdb
+C:\Users\NikolaT\Documents\18_MSHRC\code\Alice_mk1\software\joystick_input_building_block\obj\Debug\net8.0-windows\joystick_input_building_block.genruntimeconfig.cache
+C:\Users\NikolaT\Documents\18_MSHRC\code\Alice_mk1\software\joystick_input_building_block\obj\Debug\net8.0-windows\ref\joystick_input_building_block.dll

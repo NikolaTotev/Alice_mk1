@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "/u0JM5xwjh0=",
+  "dgSpecHash": "kHmn3BbinwU=",
   "success": true,
   "projectFilePath": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\serial_driver_building_block\\serial_driver_building_block\\serial_driver_building_block.csproj",
   "expectedPackageFiles": [
@@ -21,7 +21,8 @@
     "C:\\Users\\NikolaT\\.nuget\\packages\\runtime.native.system.io.ports\\9.0.5\\runtime.native.system.io.ports.9.0.5.nupkg.sha512",
     "C:\\Users\\NikolaT\\.nuget\\packages\\runtime.osx-arm64.runtime.native.system.io.ports\\9.0.5\\runtime.osx-arm64.runtime.native.system.io.ports.9.0.5.nupkg.sha512",
     "C:\\Users\\NikolaT\\.nuget\\packages\\runtime.osx-x64.runtime.native.system.io.ports\\9.0.5\\runtime.osx-x64.runtime.native.system.io.ports.9.0.5.nupkg.sha512",
-    "C:\\Users\\NikolaT\\.nuget\\packages\\system.io.ports\\9.0.5\\system.io.ports.9.0.5.nupkg.sha512"
+    "C:\\Users\\NikolaT\\.nuget\\packages\\system.io.ports\\9.0.5\\system.io.ports.9.0.5.nupkg.sha512",
+    "C:\\Users\\NikolaT\\.nuget\\packages\\microsoft.windows.sdk.net.ref\\10.0.19041.57\\microsoft.windows.sdk.net.ref.10.0.19041.57.nupkg.sha512"
   ],
   "logs": []
 }

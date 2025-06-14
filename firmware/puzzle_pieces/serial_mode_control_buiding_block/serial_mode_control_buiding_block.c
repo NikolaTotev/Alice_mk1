@@ -23,16 +23,29 @@ static int buffer_index = 0;
 static bool led_state = false;
 bool running = false;
 bool serial_data_available = false;
+bool move_motor = false;
+int movement_speed = 800;
 
 // Built-in LED pin
 #define LED_PIN 25
+#define step_pin 4
+#define dir_pin 5
+#define driver_ena_pin 7
+#define shifter_ena_pin 8
 
 const char *start_cmd = "start";
 const char *cli_opt = "cli";
 const char *gui_opt = "gui";
+const char *cmd_move_cw = "mcw";
+const char *cmd_move_ccw = "mccw";
+const char *cmd_update_speed = "update-speed";
+const char *stop_cmd = "stop";
 
 // Function declarations
 void process_command(const char *command);
+void move_cw(char *args_token);
+void move_ccw(char *args_token);
+void update_speed(char *args_token);
 void process_start_cmd(char *command);
 bool get_pi_input();
 
@@ -42,13 +55,30 @@ int main()
     stdio_init_all();
 
     gpio_init(LED_PIN);
+    gpio_init(step_pin);
+    gpio_init(dir_pin);
+    gpio_init(driver_ena_pin);
+    gpio_init(shifter_ena_pin);
+
     gpio_set_dir(LED_PIN, GPIO_OUT);
+    gpio_set_dir(step_pin, GPIO_OUT);
+    gpio_set_dir(dir_pin, GPIO_OUT);
+    gpio_set_dir(driver_ena_pin, GPIO_OUT);
+    gpio_set_dir(shifter_ena_pin, GPIO_OUT);
+
     gpio_put(LED_PIN, false);
+    gpio_put(step_pin, true);
+    gpio_put(dir_pin, true);
+    gpio_put(driver_ena_pin, true);
+    gpio_put(shifter_ena_pin, true);
 
     // Wait for USB connection
     while (!stdio_usb_connected())
     {
+        gpio_put(LED_PIN, true);
         sleep_ms(100);
+        gpio_put(LED_PIN, false);
+        sleep_ms(50);
     }
 
     // Before continuing execution/starting the rest of the system wait for start command from GUI/PI
@@ -68,6 +98,7 @@ int main()
         {
             printf("Invalid start command...");
         }
+        printf("Starting...");
     }
 
     printf("Alice Mk1 is running!");
@@ -82,11 +113,10 @@ int main()
         }
         else
         {
-            gpio_put(LED_PIN, true);
-            sleep_ms(100);
-            gpio_put(LED_PIN, false);
-            sleep_ms(300);
-            sleep_ms(200);
+            // gpio_put(LED_PIN, true);
+            // sleep_us(10);
+            // gpio_put(LED_PIN, false);
+            // sleep_us(10);
         }
     }
 
@@ -141,7 +171,112 @@ void process_start_cmd(char *command)
 
 void process_command(const char *command)
 {
-    printf(">>> You said: %s\n", command);
+    printf("Raw Received cmd was: %s\n", command);
+
+    char *token = strtok(command, "_");
+    bool start_received = false;
+
+    if (token != NULL)
+    {
+        if (strcmp(token, cmd_move_cw) == 0)
+        {
+            printf("Recieved move_cw...\n");
+            token = strtok(NULL, "_");
+            move_cw(token);
+        }
+        else if (strcmp(token, cmd_move_ccw) == 0)
+        {
+            printf("Recieved move_ccw...\n");
+            token = strtok(NULL, "_");
+            move_ccw(token);
+        }
+        else if (strcmp(token, stop_cmd) == 0)
+        {
+            printf("Recieved stop...");
+            move_motor = false;
+        }
+        else if (strcmp(token, cmd_update_speed) == 0)
+        {
+            printf("Updating speed...");
+            token = strtok(NULL, "_");
+            update_speed(token);
+        }
+        else
+        {
+            printf("Invalid command ...\n");
+            return;
+        }
+    }
+}
+void update_speed(char *args_token)
+{
+    if (args_token != NULL)
+    {
+        printf(args_token);
+        int number = atoi(args_token); // +1 to skip the underscore
+        movement_speed = number;
+    }
+}
+
+void move_cw(char *args_token)
+{
+    printf("Executing move_cw...\n");
+    move_motor = true;
+    gpio_put(dir_pin, false);
+    sleep_us(6);
+
+    if (args_token != NULL)
+    {
+        printf(args_token);
+        int number = atoi(args_token); // +1 to skip the underscore
+        movement_speed = number;
+    }
+
+    while (move_motor)
+    {
+        serial_data_available = get_pi_input();
+
+        if (serial_data_available)
+        {
+            process_command(input_buffer);
+        }
+
+        gpio_put(step_pin, false);
+        sleep_us(movement_speed);
+        gpio_put(step_pin, true);
+        sleep_us(movement_speed);
+    }
+}
+
+void move_ccw(char *args_token)
+{
+    printf("Executing move_ccw...\n");
+    move_motor = true;
+    gpio_put(dir_pin, true);
+    sleep_us(6);
+
+    
+    if (args_token != NULL)
+    {
+        printf(args_token);
+        int number = atoi(args_token); // +1 to skip the underscore
+        movement_speed = number;
+    }
+
+    while (move_motor)
+    {
+        serial_data_available = get_pi_input();
+
+        if (serial_data_available)
+        {
+            process_command(input_buffer);
+        }
+
+        gpio_put(step_pin, false);
+        sleep_us(movement_speed);
+        gpio_put(step_pin, true);
+        sleep_us(movement_speed);
+    }
 }
 
 bool get_pi_input()

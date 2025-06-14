@@ -202,7 +202,7 @@ int main()
             sleep_ms(1);
             counter = 0;
         }
-        sleep_ms(1000);
+        sleep_ms(1);
     }
 
     return 0;

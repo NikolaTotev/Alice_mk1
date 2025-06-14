@@ -47,9 +47,9 @@ public class RP2040SerialCommunicator
             StopBits = StopBits.One,
             Handshake = Handshake.None,
             ReadTimeout = 1000,
-            WriteTimeout = 1000,                   
+            WriteTimeout = 1000,
             DtrEnable = true,
-            RtsEnable = true,           
+            RtsEnable = true,
         };
 
         //_serialPort.DsrHolding = false;
@@ -65,9 +65,9 @@ public class RP2040SerialCommunicator
         {
             lock (_lockObject)
             {
-            
+
                 _serialPort.PortName = portName;
-                _serialPort.Open();                
+                _serialPort.Open();
 
                 PortName = portName;
                 _isConnected = true;
@@ -217,8 +217,17 @@ public class RP2040SerialCommunicator
         try
         {
             return await Task.Run(() =>
-            {                
-                return _serialPort.ReadLine();
+            {
+                try
+                {
+                    return _serialPort.ReadLine();
+                }
+                catch (Exception)
+                {
+
+                    return "";
+                }
+
             });
         }
         catch (TimeoutException)
@@ -257,7 +266,7 @@ public class RP2040SerialCommunicator
                 if (_serialPort?.IsOpen == true)
                 {
                     byte[] data = Encoding.UTF8.GetBytes(command);
-                    Console.WriteLine(data.Length);
+                    Console.WriteLine($"Data length sent:{data.Length}");
                     _serialPort.Write(command);
                 }
             }
@@ -327,4 +336,3 @@ public class RP2040SerialCommunicator
     }
 }
 
-  
