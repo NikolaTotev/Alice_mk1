@@ -22,10 +22,9 @@ typedef struct
 #define LED_PIN 25
 
 // Frame format definitions (since they're not in the SDK)
-#define FRAME_FORMAT_MOTOROLA  0x0
-#define FRAME_FORMAT_TI        0x1
+#define FRAME_FORMAT_MOTOROLA 0x0
+#define FRAME_FORMAT_TI 0x1
 #define FRAME_FORMAT_MICROWIRE 0x2
-
 
 // Global variables for interrupt handling
 volatile bool data_ready = false;
@@ -50,9 +49,10 @@ DataPacket tx_data;
 //         }
 //     }
 // }
-
+#define pico_num 1
 int main()
 {
+    bool led_status = false;
     stdio_init_all();
 
     gpio_init(LED_PIN);
@@ -72,7 +72,7 @@ int main()
         sleep_ms(300);
     }
 
-    printf("SPI Slave (SPI0) initialized\n");
+    printf("PICO %lu SPI Slave (SPI0) initialized\n", pico_num);
 
     // Initialize SPI0
     spi_init(spi0, SPI_FREQ);
@@ -80,7 +80,7 @@ int main()
     // Set SPI format
     // spi_set_format(spi0, 8, SPI_CPOL_1, SPI_CPHA_0, SPI_MSB_FIRST);
 
-     spi_set_format(spi0, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
+    spi_set_format(spi0, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
 
     // Get hardware register access
     spi_hw_t *hw = spi_get_hw(spi0);
@@ -90,7 +90,6 @@ int main()
     cr0 &= ~(0x3 << 4);            // Clear FRF field
     cr0 |= (FRAME_FORMAT_TI << 4); // Set TI format
     hw->cr0 = cr0;
-
 
     // Set SPI0 to slave mode
     spi_set_slave(spi0, true);
@@ -117,30 +116,49 @@ int main()
         // Check if CS is low (active)
         // if (!gpio_get(SPI0_CS))
         // {
-        printf("Waiting to read...\n");
-        gpio_put(LED_PIN, true);
+        printf("Pico %lu Waiting to read...\n", pico_num);
+        // gpio_put(LED_PIN, true);
         // First, read incoming data from master
         spi_read_blocking(spi0, 0xFF, (uint8_t *)&rx_data, sizeof(DataPacket));
 
+        uint32_t s = rx_data.num1;
+
         // Prepare response data
         tx_data.num1 = rx_data.num1;
-        tx_data.num2 = rx_data.num2;
+        tx_data.num2 = pico_num;
+
+        
 
         // // Then send response data back
         spi_write_blocking(spi0, (uint8_t *)&tx_data, sizeof(DataPacket));
 
-        //spi_write_read_blocking(spi0, (uint8_t *)&tx_data, (uint8_t *)&rx_data, sizeof(DataPacket));
+        if (111 == 111 * pico_num)
+        {
+            if (led_status)
+            {
+                led_status = false;
+                printf("LED STATUS 1");
+            }
+            else
+            {
+                led_status = true;
+                printf("LED STATUS 0");
+            }
+
+            gpio_put(LED_PIN, led_status);
+        }
+        // spi_write_read_blocking(spi0, (uint8_t *)&tx_data, (uint8_t *)&rx_data, sizeof(DataPacket));
 
         // Wait for CS to go high
         // while (!gpio_get(SPI0_CS))
         // {
         //     tight_loop_contents();
         // }
-        gpio_put(LED_PIN, false);
+        // gpio_put(LED_PIN, false);
 
         // Process received data
-        printf("PICO 1 >> Received: num1=%lu, num2=%lu\n", rx_data.num1, rx_data.num2);
-        printf("PICO 1 >> Sent back: num1=%lu, num2=%lu\n\n", tx_data.num1, tx_data.num2);
+        printf("PICO  %lu >> Received: num1=%lu, num2=%lu\n", pico_num, rx_data.num1, rx_data.num2);
+        printf("PICO  %lu >> Sent back: num1=%lu, num2=%lu\n\n", pico_num, tx_data.num1, tx_data.num2);
 
         response_counter++;
         //}
