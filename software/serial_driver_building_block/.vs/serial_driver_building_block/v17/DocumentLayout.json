@@ -3,16 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\serial_driver_building_block\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F035621F-7632-492A-85B7-FE3C52DA60A6}|serial_driver_building_block\\serial_driver_building_block.csproj|c:\\users\\nikolat\\documents\\18_mshrc\\code\\alice_mk1\\software\\serial_driver_building_block\\serial_driver_building_block\\rp2040serialcommunicator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F035621F-7632-492A-85B7-FE3C52DA60A6}|serial_driver_building_block\\serial_driver_building_block.csproj|solutionrelative:serial_driver_building_block\\rp2040serialcommunicator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{F035621F-7632-492A-85B7-FE3C52DA60A6}|serial_driver_building_block\\serial_driver_building_block.csproj|c:\\users\\nikolat\\documents\\18_mshrc\\code\\alice_mk1\\software\\serial_driver_building_block\\serial_driver_building_block\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{F035621F-7632-492A-85B7-FE3C52DA60A6}|serial_driver_building_block\\serial_driver_building_block.csproj|solutionrelative:serial_driver_building_block\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F035621F-7632-492A-85B7-FE3C52DA60A6}|serial_driver_building_block\\serial_driver_building_block.csproj|c:\\users\\nikolat\\documents\\18_mshrc\\code\\alice_mk1\\software\\serial_driver_building_block\\serial_driver_building_block\\serial_driver_building_block.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
       "RelativeMoniker": "D:0:0:{F035621F-7632-492A-85B7-FE3C52DA60A6}|serial_driver_building_block\\serial_driver_building_block.csproj|solutionrelative:serial_driver_building_block\\serial_driver_building_block.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F035621F-7632-492A-85B7-FE3C52DA60A6}|serial_driver_building_block\\serial_driver_building_block.csproj|c:\\users\\nikolat\\documents\\18_mshrc\\code\\alice_mk1\\software\\serial_driver_building_block\\serial_driver_building_block\\rp2040serialcommunicator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F035621F-7632-492A-85B7-FE3C52DA60A6}|serial_driver_building_block\\serial_driver_building_block.csproj|solutionrelative:serial_driver_building_block\\rp2040serialcommunicator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,43 +22,41 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "serial_driver_building_block",
+              "DocumentIndex": 1,
+              "Title": "serial_driver_building_block.csproj",
               "DocumentMoniker": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\serial_driver_building_block\\serial_driver_building_block\\serial_driver_building_block.csproj",
               "RelativeDocumentMoniker": "serial_driver_building_block\\serial_driver_building_block.csproj",
               "ToolTip": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\serial_driver_building_block\\serial_driver_building_block\\serial_driver_building_block.csproj",
               "RelativeToolTip": "serial_driver_building_block\\serial_driver_building_block.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-06-14T11:11:30.692Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-14T11:11:30.692Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "RP2040SerialCommunicator.cs",
               "DocumentMoniker": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\serial_driver_building_block\\serial_driver_building_block\\RP2040SerialCommunicator.cs",
               "RelativeDocumentMoniker": "serial_driver_building_block\\RP2040SerialCommunicator.cs",
               "ToolTip": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\serial_driver_building_block\\serial_driver_building_block\\RP2040SerialCommunicator.cs",
               "RelativeToolTip": "serial_driver_building_block\\RP2040SerialCommunicator.cs",
-              "ViewState": "AgIAAPwAAAAAAAAAAAAowA0BAAAUAAAAAAAAAA==",
+              "ViewState": "AgIAAP8AAAAAAAAAAAAowA0BAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-27T20:08:27.336Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-27T20:08:27.336Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\serial_driver_building_block\\serial_driver_building_block\\Program.cs",
               "RelativeDocumentMoniker": "serial_driver_building_block\\Program.cs",
               "ToolTip": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\serial_driver_building_block\\serial_driver_building_block\\Program.cs",
               "RelativeToolTip": "serial_driver_building_block\\Program.cs",
-              "ViewState": "AgIAAAgBAAAAAAAAAAAkwB4BAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAABEBAAAAAAAAAAAwwDMBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-27T19:10:32.959Z",
               "EditorCaption": ""

@@ -39,7 +39,8 @@ message send_angle;
 message incoming_command;
 
 // Define the CS pin for the AS5048A
-const int CS_PIN = 7;  // GPIO7 on ESP32 C3 mini 1
+const int CS_PIN = 20;  // GPIO7 on ESP32 C3 mini 1
+const int spi_ena = 7;  // GPIO7 on ESP32 C3 mini 1
 
 // Create an AS5048A object
 AS5048A encoder(CS_PIN);
@@ -99,7 +100,9 @@ void printDiagnostics() {
   uint8_t diag = encoder.readDiagnostics();
   uint8_t agc = encoder.readAGC();
   uint16_t magnitude = encoder.readMagnitude();
-  
+ // turn the LED off by making the voltage LOW
+
+
   Serial.println("Diagnostics:");
   Serial.print("  OCF (Offset Compensation Finished): ");
   Serial.println((diag & encoder.DIAG_OCF) ? "Yes" : "No");
@@ -154,7 +157,9 @@ void setup() {
   // Initialize serial communication
   Serial.begin(115200);
   delay(1000);  // Wait for serial connection
-    
+  pinMode(spi_ena, OUTPUT);
+  digitalWrite(spi_ena, HIGH);  
+  delay(50);  // Wait for serial connection
   // Initialize the encoder
   if (encoder.begin()) {
     Serial.println("Encoder initialized successfully");
@@ -265,9 +270,9 @@ void loop() {
   // }
   
   // // Periodically read and display angle values
-  // static unsigned long lastReadTime = 0;
-  // if (millis() - lastReadTime > 500) {  // Update every 500ms
-  //   printAngleReadings();
-  //   lastReadTime = millis();
-  // }
+  static unsigned long lastReadTime = 0;
+  if (millis() - lastReadTime > 500) {  // Update every 500ms
+    printAngleReadings();
+    lastReadTime = millis();
+  }
 }

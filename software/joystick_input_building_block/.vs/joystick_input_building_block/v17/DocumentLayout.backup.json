@@ -23,12 +23,12 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "joystick_input_building_block",
+              "Title": "joystick_input_building_block.csproj",
               "DocumentMoniker": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\joystick_input_building_block\\joystick_input_building_block.csproj",
               "RelativeDocumentMoniker": "joystick_input_building_block.csproj",
               "ToolTip": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\joystick_input_building_block\\joystick_input_building_block.csproj",
               "RelativeToolTip": "joystick_input_building_block.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAfAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
               "WhenOpened": "2025-06-14T06:36:59.691Z",
               "EditorCaption": ""
@@ -41,7 +41,7 @@
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\joystick_input_building_block\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAALUAAAAAAAAAAAAQwNIAAAAEAAAAAAAAAA==",
+              "ViewState": "AgIAAKIAAAAAAAAAAAAwwMMAAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-06-14T06:36:53.365Z",
               "EditorCaption": ""

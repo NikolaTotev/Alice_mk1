@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("joystick_input_building_block")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c6616b58ffe89364f1eb86502a1b250928ff914b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+04371bea958a0f0df025519b8ad5a2b68ddf41e5")]
 [assembly: System.Reflection.AssemblyProductAttribute("joystick_input_building_block")]
 [assembly: System.Reflection.AssemblyTitleAttribute("joystick_input_building_block")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

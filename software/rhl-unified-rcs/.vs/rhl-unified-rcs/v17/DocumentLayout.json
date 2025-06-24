@@ -1,0 +1,104 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\rhl-unified-rcs\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{1D0CA5D4-1050-45F0-94A8-5F3E1F1C14CC}|rhl-unified-rcs.csproj|c:\\users\\nikolat\\documents\\18_mshrc\\code\\alice_mk1\\software\\rhl-unified-rcs\\rhl-unified-rcs.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{1D0CA5D4-1050-45F0-94A8-5F3E1F1C14CC}|rhl-unified-rcs.csproj|solutionrelative:rhl-unified-rcs.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1D0CA5D4-1050-45F0-94A8-5F3E1F1C14CC}|rhl-unified-rcs.csproj|c:\\users\\nikolat\\documents\\18_mshrc\\code\\alice_mk1\\software\\rhl-unified-rcs\\mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{1D0CA5D4-1050-45F0-94A8-5F3E1F1C14CC}|rhl-unified-rcs.csproj|solutionrelative:mainpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1D0CA5D4-1050-45F0-94A8-5F3E1F1C14CC}|rhl-unified-rcs.csproj|c:\\users\\nikolat\\documents\\18_mshrc\\code\\alice_mk1\\software\\rhl-unified-rcs\\mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1D0CA5D4-1050-45F0-94A8-5F3E1F1C14CC}|rhl-unified-rcs.csproj|solutionrelative:mainpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1D0CA5D4-1050-45F0-94A8-5F3E1F1C14CC}|rhl-unified-rcs.csproj|c:\\users\\nikolat\\documents\\18_mshrc\\code\\alice_mk1\\software\\rhl-unified-rcs\\appshell.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{1D0CA5D4-1050-45F0-94A8-5F3E1F1C14CC}|rhl-unified-rcs.csproj|solutionrelative:appshell.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1D0CA5D4-1050-45F0-94A8-5F3E1F1C14CC}|rhl-unified-rcs.csproj|c:\\users\\nikolat\\documents\\18_mshrc\\code\\alice_mk1\\software\\rhl-unified-rcs\\mauiprogram.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1D0CA5D4-1050-45F0-94A8-5F3E1F1C14CC}|rhl-unified-rcs.csproj|solutionrelative:mauiprogram.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 1,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedHeight": 139,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AppShell.xaml",
+              "DocumentMoniker": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\rhl-unified-rcs\\AppShell.xaml",
+              "RelativeDocumentMoniker": "AppShell.xaml",
+              "ToolTip": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\rhl-unified-rcs\\AppShell.xaml",
+              "RelativeToolTip": "AppShell.xaml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-06-24T14:43:44.216Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "rhl-unified-rcs.csproj",
+              "DocumentMoniker": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\rhl-unified-rcs\\rhl-unified-rcs.csproj",
+              "RelativeDocumentMoniker": "rhl-unified-rcs.csproj",
+              "ToolTip": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\rhl-unified-rcs\\rhl-unified-rcs.csproj",
+              "RelativeToolTip": "rhl-unified-rcs.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-06-24T10:21:40.853Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MainPage.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\rhl-unified-rcs\\MainPage.xaml.cs",
+              "RelativeDocumentMoniker": "MainPage.xaml.cs",
+              "ToolTip": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\rhl-unified-rcs\\MainPage.xaml.cs",
+              "RelativeToolTip": "MainPage.xaml.cs",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAiwBYAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-24T10:20:28.688Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MauiProgram.cs",
+              "DocumentMoniker": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\rhl-unified-rcs\\MauiProgram.cs",
+              "RelativeDocumentMoniker": "MauiProgram.cs",
+              "ToolTip": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\rhl-unified-rcs\\MauiProgram.cs",
+              "RelativeToolTip": "MauiProgram.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-24T10:20:10.133Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MainPage.xaml",
+              "DocumentMoniker": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\rhl-unified-rcs\\MainPage.xaml",
+              "RelativeDocumentMoniker": "MainPage.xaml",
+              "ToolTip": "C:\\Users\\NikolaT\\Documents\\18_MSHRC\\code\\Alice_mk1\\software\\rhl-unified-rcs\\MainPage.xaml",
+              "RelativeToolTip": "MainPage.xaml",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAAABoAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-06-24T10:14:27.861Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

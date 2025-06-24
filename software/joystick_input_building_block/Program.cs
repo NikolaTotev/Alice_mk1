@@ -175,8 +175,10 @@ class Program
         var axes = new double[js.AxisCount];
         var buttons = new bool[js.ButtonCount];
 
+
         Console.Clear();
-        Console.WriteLine($"Controller: {js.DisplayName ?? "Unknown"}\n");
+        Console.WriteLine($"Controller: {js.DisplayName ?? "Unknown"}  {count}, {js.AxisCount}, {js.ButtonCount}\n");
+        //Console.WriteLine($"Counts: {count}, {js.AxisCount}, {js.ButtonCount}");
 
         while (!Console.KeyAvailable)
         {
@@ -187,7 +189,7 @@ class Program
             Console.WriteLine("MAPPED AXES:");
             for (int i = 0; i < axes.Length; i++)
             {
-                double mapped = MapAxisValue(axes[i]);
+                double mapped = axes[i];// MapAxisValue(axes[i]);
                 Console.WriteLine($"  Axis {i}: {mapped,4:F0} (raw: {axes[i]:F3})");
             }
 
@@ -208,5 +210,109 @@ class Program
         return rawValue < 0.6 ? 0 : 250 + ((rawValue - 0.6) / 0.4 * 350);
     }
 
-    
+
 }
+
+
+//using System;
+//using System.Runtime.InteropServices;
+//using System.Threading;
+
+//class Program
+//{
+//    [DllImport("xinput1_4.dll")]
+//    static extern int XInputGetState(int dwUserIndex, ref XInputState pState);
+
+//    [DllImport("kernel32.dll", SetLastError = true)]
+//    static extern IntPtr GetStdHandle(int nStdHandle);
+
+//    [DllImport("kernel32.dll")]
+//    static extern bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
+
+//    [DllImport("kernel32.dll")]
+//    static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
+
+//    [StructLayout(LayoutKind.Sequential)]
+//    public struct XInputState
+//    {
+//        public uint dwPacketNumber;
+//        public XInputGamepad Gamepad;
+//    }
+
+//    [StructLayout(LayoutKind.Sequential)]
+//    public struct XInputGamepad
+//    {
+//        public ushort wButtons;
+//        public byte bLeftTrigger;
+//        public byte bRightTrigger;
+//        public short sThumbLX;
+//        public short sThumbLY;
+//        public short sThumbRX;
+//        public short sThumbRY;
+//    }
+
+//    const int STD_INPUT_HANDLE = -10;
+//    const uint ENABLE_QUICK_EDIT = 0x0040;
+//    const uint ENABLE_MOUSE_INPUT = 0x0010;
+//    const uint ENABLE_WINDOW_INPUT = 0x0008;
+
+//    static void Main()
+//    {
+//        // Disable console quick edit and mouse input
+//        IntPtr consoleHandle = GetStdHandle(STD_INPUT_HANDLE);
+//        uint consoleMode;
+//        GetConsoleMode(consoleHandle, out consoleMode);
+//        consoleMode &= ~(ENABLE_QUICK_EDIT | ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT);
+//        SetConsoleMode(consoleHandle, consoleMode);
+
+//        Console.CursorVisible = false;
+//        Console.Clear();
+//        Console.WriteLine("XInput Direct Test - Press ESC to exit\n");
+
+//        var state = new XInputState();
+
+//        while (!Console.KeyAvailable || Console.ReadKey(true).Key != ConsoleKey.Escape)
+//        {
+//            int result = XInputGetState(0, ref state);
+
+//            Console.SetCursorPosition(0, 3);
+
+//            if (result == 0) // SUCCESS
+//            {
+//                var gp = state.Gamepad;
+
+//                // Convert to float (-1 to 1)
+//                float leftX = gp.sThumbLX / 32768f;
+//                float leftY = gp.sThumbLY / 32768f;
+//                float rightX = gp.sThumbRX / 32768f;
+//                float rightY = gp.sThumbRY / 32768f;
+
+//                Console.WriteLine($"Packet: {state.dwPacketNumber}");
+//                Console.WriteLine($"Left:  X={leftX,7:F3} Y={leftY,7:F3}");
+//                Console.WriteLine($"Right: X={rightX,7:F3} Y={rightY,7:F3}");
+//                Console.WriteLine($"Triggers: L={gp.bLeftTrigger,3} R={gp.bRightTrigger,3}");
+//                Console.WriteLine($"Buttons: 0x{gp.wButtons:X4}");
+
+//                // Button states
+//                Console.Write("Pressed: ");
+//                if ((gp.wButtons & 0x1000) != 0) Console.Write("A ");
+//                if ((gp.wButtons & 0x2000) != 0) Console.Write("B ");
+//                if ((gp.wButtons & 0x4000) != 0) Console.Write("X ");
+//                if ((gp.wButtons & 0x8000) != 0) Console.Write("Y ");
+//                Console.WriteLine("          ");
+//            }
+//            else
+//            {
+//                Console.WriteLine("Controller disconnected     ");
+//                Console.WriteLine("                           ");
+//                Console.WriteLine("                           ");
+//                Console.WriteLine("                           ");
+//                Console.WriteLine("                           ");
+//            }
+
+//            Thread.Sleep(16);
+//        }
+//    }
+//}
+
+
