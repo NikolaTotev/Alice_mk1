@@ -174,15 +174,16 @@ class Program
         var js = RawGameController.RawGameControllers[0];
         var axes = new double[js.AxisCount];
         var buttons = new bool[js.ButtonCount];
+        var switches = new GameControllerSwitchPosition[js.SwitchCount];
 
 
         Console.Clear();
         Console.WriteLine($"Controller: {js.DisplayName ?? "Unknown"}  {count}, {js.AxisCount}, {js.ButtonCount}\n");
         //Console.WriteLine($"Counts: {count}, {js.AxisCount}, {js.ButtonCount}");
 
-        while (!Console.KeyAvailable)
+        while (true)
         {
-            js.GetCurrentReading(buttons, null, axes);
+            js.GetCurrentReading(buttons, switches, axes);
             Console.SetCursorPosition(0, 2);
 
             // Display mapped axes
@@ -199,6 +200,7 @@ class Program
             {
                 if (buttons[i]) Console.Write($"[{i}] ");
             }
+            Console.WriteLine($"{js.SwitchCount} {switches[0]}");
             Console.WriteLine("        ");
 
             Thread.Sleep(20);

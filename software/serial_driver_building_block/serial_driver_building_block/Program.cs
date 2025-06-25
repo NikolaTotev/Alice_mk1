@@ -69,8 +69,23 @@
 
 using System.Net.WebSockets;
 using Windows.Gaming.Input;
+public struct RobotState
+{ 
+    public int joint_1_dir;
+    public int joint_2_dir;
+    public int joint_3_dir;
+    public int joint_4_dir;
+    public int joint_5_dir;
+    public int joint_1_speed;
+    public int joint_2_speed;
+    public int joint_3_speed;
+    public int stop;
+    public int gripper_open;
+}
 internal class Program
 {
+
+
     private static async Task Main(string[] args)
     {
 
@@ -78,10 +93,12 @@ internal class Program
         var count = RawGameController.RawGameControllers.Count;
         count = RawGameController.RawGameControllers.Count;
 
-        if (count == 0)
+        while (count == 0)
         {
+            count = RawGameController.RawGameControllers.Count;
             Console.WriteLine("No controller found!");
-            return;
+            await Task.Delay(1000);
+
         }
 
         var js = RawGameController.RawGameControllers[0];
@@ -149,6 +166,7 @@ internal class Program
         var switches = new GameControllerSwitchPosition[js.SwitchCount];
         var buttons = new bool[js.ButtonCount];
         var previousHatPosition = GameControllerSwitchPosition.Center;
+        bool previous_gripper_position = false;
         bool isStopped = true;
 
         while (true)
@@ -167,118 +185,245 @@ internal class Program
 
             js.GetCurrentReading(buttons, switches, axes);
             //Console.WriteLine($"{switches.Length}");
-            double mapped = 1000;
+            double mapped_1 = 1000;
+            double mapped_2 = 1000;
+            double mapped_3 = 1000;
+
 
             if (axes[0] >= 0.6)
+            {                
+                mapped_2 = MapAxisValue(axes[0]);             
+            }
+            else
+            {                
+                mapped_2 = MapAxisValueLeft(axes[0]);             
+            }
+
+            if (axes[1] >= 0.6)
+            {                
+                mapped_3 = MapAxisValue(axes[1]);
+            }
+            else
+            {             
+                mapped_3 = MapAxisValueLeft(axes[1]);
+            }
+
+            if (axes[2] >= 0.6)
             {
-                mapped = MapAxisValue(axes[0]);
+                mapped_1 = MapAxisValue(axes[2]);             
             }
             else
             {
-                mapped = MapAxisValueLeft(axes[0]);
+                mapped_1 = MapAxisValueLeft(axes[2]);                
             }
-            
-                        
-            
-            if (buttons[0])
+
+            RobotState state = new RobotState();
+
+            state.stop = Convert.ToInt32(buttons[0]);
+            if (buttons[3])
             {
-                if (mapped == 0)
-                {
-                    if(!isStopped)
-                    {
-                        await communicator.SendCustomCommand("stop");
-                        Console.WriteLine("Stopping");
-                        isStopped = true;
-                    }                    
-                }
-
-                if (axes[0] >= 0.6)
-                {
-                    if (isStopped)
-                    {
-                        await communicator.SendCustomCommand($"mcw_{Convert.ToInt32(mapped)}");
-                        Console.WriteLine($"mcw_{Convert.ToInt32(mapped)}");
-                        isStopped = false;
-                    }
-                    else
-                    {
-                        await communicator.SendCustomCommand($"update-speed_{Convert.ToInt32(mapped)}");
-                        Console.WriteLine($"mcw_{Convert.ToInt32(mapped)}");
-                    }
-
-                }
-
-                if (axes[0] <= 0.4)
-                {
-                    if (isStopped)
-                    {
-                        await communicator.SendCustomCommand($"mccw_{Convert.ToInt32(mapped)}");
-                        Console.WriteLine($"mccw_{Convert.ToInt32(mapped)}");
-                        isStopped = false;
-                    }
-
-                    else
-                    {
-                        await communicator.SendCustomCommand($"update-speed_{Convert.ToInt32(mapped)}");
-                        Console.WriteLine($"update-speed_{Convert.ToInt32(mapped)}");
-                    }
-                }
-
-
-                //if (switches.Length > 0)
-                //{
-                //    var currentHatPosition = switches[0];
-
-                //    if (currentHatPosition != previousHatPosition)
-                //    {
-
-                //        if (switches[0] == GameControllerSwitchPosition.Center)
-                //        {
-                //            await communicator.SendCustomCommand("stop");
-                //            Console.WriteLine("Stopping");
-                //            isStopped = true;
-                //        }
-
-                //        if (switches[0] == GameControllerSwitchPosition.Right)
-                //        {
-                //            await communicator.SendCustomCommand("mcw_800");
-                //            Console.WriteLine("mcw");
-                //            isStopped = false;
-                //        }
-
-                //        if (switches[0] == GameControllerSwitchPosition.Left)
-                //        {
-                //            await communicator.SendCustomCommand("mccw");
-                //            Console.WriteLine("mccw");
-                //            isStopped = false;
-                //        }
-
-                //        previousHatPosition = switches[0];
-                //    }
-                //}
+                state.gripper_open = Convert.ToInt32(!previous_gripper_position);
+                previous_gripper_position = Convert.ToBoolean(state.gripper_open);
             }
             else
             {
-                if (!isStopped)
-                {
-                    await communicator.SendCustomCommand("stop");
-                    Console.WriteLine("Stopping");
-                    isStopped = true;
-                }
-
+                state.gripper_open = Convert.ToInt32(!previous_gripper_position);
             }
 
 
+            //Joint 1 direction handling
+            //CW = true CCW = false
+            if (axes[2] >= 0.6)
+            {
+                state.joint_1_dir = Convert.ToInt32(false);
+            }
+            else
+            {
+                state.joint_1_dir = Convert.ToInt32(true);
+            }
+
+            //Joint 2 direction handling
+            //CW = true CCW = false
+            if (axes[0] >= 0.6)
+            {
+                state.joint_2_dir = Convert.ToInt32(true);
+            }
+            else
+            {
+                state.joint_2_dir = Convert.ToInt32(false);
+            }
+
+            //Joint 3 direction handling
+            //CW = true CCW = false
+            if (axes[1] >= 0.6)
+            {
+                state.joint_3_dir = Convert.ToInt32(false);
+            }
+            else
+            {
+                state.joint_3_dir = Convert.ToInt32(true);
+            }
+
+            //Joint 4 direction handling
+            //CW = true CCW = false
+            if (switches[0] == GameControllerSwitchPosition.Down)
+            {
+                state.joint_4_dir = Convert.ToInt32(false);
+            }
+
+            if (switches[0] == GameControllerSwitchPosition.Up)
+            {
+                state.joint_4_dir = Convert.ToInt32(true);
+            }
+
+            if (switches[0] == GameControllerSwitchPosition.Right)
+            {
+                state.joint_5_dir = Convert.ToInt32(true);
+            }
+
+            if (switches[0] == GameControllerSwitchPosition.Left)
+            {
+                state.joint_5_dir = Convert.ToInt32(false);
+            }
+
+            if(mapped_1 < 300 && mapped_1 != 0)
+            {
+                mapped_1 = 300;
+            }
+
+            if (mapped_3 < 200 && mapped_3 != 0)
+            {
+                mapped_3 = 200;
+            }
+
+            if (mapped_2 < 400 && mapped_2 != 0)
+            {
+                mapped_2 = 400;
+            }
 
 
+            state.joint_1_speed = Convert.ToInt32(mapped_1);
+            state.joint_2_speed = Convert.ToInt32(mapped_2);
+            state.joint_3_speed = Convert.ToInt32(mapped_3);
 
 
-            //await communicator.SendCustomCommand(input);
+            await communicator.SendCustomCommand($"us_{state.stop}_" +
+                $"{state.joint_1_dir}_" +
+                $"{state.joint_2_dir}_" +
+                $"{state.joint_3_dir}_" +
+                $"{state.joint_4_dir}_" +
+                $"{state.joint_5_dir}_" +
+                $"{state.joint_1_speed}_" +
+                $"{state.joint_2_speed}_" +
+                $"{state.joint_3_speed}_" +
+                $"{state.gripper_open}");
 
+            Console.WriteLine($"SENT STATE IS: {state.stop}_" +
+                $"{state.joint_1_dir}_" +
+                $"{state.joint_2_dir}_" +
+                $"{state.joint_3_dir}_" +
+                $"{state.joint_4_dir}_" +
+                $"{state.joint_5_dir}_" +
+                $"{state.joint_1_speed}_" +
+                $"{state.joint_2_speed}_" +
+                $"{state.joint_3_speed}_" +
+                $"{state.gripper_open}");
+
+            // stop_dir1_dir2_dir3_dir4_dir5_speed1_speed2_speed3_gripper
+            //if (buttons[0])
+            //{
+            //    if (mapped == 0)
+            //    {
+            //        if (!isStopped)
+            //        {
+            //            await communicator.SendCustomCommand("stop");
+            //            Console.WriteLine("Stopping");
+            //            isStopped = true;
+            //        }
+            //    }
+
+            //    if (axes[0] >= 0.6)
+            //    {
+            //        if (isStopped)
+            //        {
+            //            await communicator.SendCustomCommand($"mcw_{Convert.ToInt32(mapped)}");
+            //            Console.WriteLine($"mcw_{Convert.ToInt32(mapped)}");
+            //            isStopped = false;
+            //        }
+            //        else
+            //        {
+            //            await communicator.SendCustomCommand($"update-speed_{Convert.ToInt32(mapped)}");
+            //            Console.WriteLine($"mcw_{Convert.ToInt32(mapped)}");
+            //        }
+
+            //    }
+
+            //    if (axes[0] <= 0.4)
+            //    {
+            //        if (isStopped)
+            //        {
+            //            await communicator.SendCustomCommand($"mccw_{Convert.ToInt32(mapped)}");
+            //            Console.WriteLine($"mccw_{Convert.ToInt32(mapped)}");
+            //            isStopped = false;
+            //        }
+
+            //        else
+            //        {
+            //            await communicator.SendCustomCommand($"update-speed_{Convert.ToInt32(mapped)}");
+            //            Console.WriteLine($"update-speed_{Convert.ToInt32(mapped)}");
+            //        }
+            //    }
+
+
+            //    //if (switches.Length > 0)
+            //    //{
+            //    //    var currentHatPosition = switches[0];
+
+            //    //    if (currentHatPosition != previousHatPosition)
+            //    //    {
+
+            //    //        if (switches[0] == GameControllerSwitchPosition.Center)
+            //    //        {
+            //    //            await communicator.SendCustomCommand("stop");
+            //    //            Console.WriteLine("Stopping");
+            //    //            isStopped = true;
+            //    //        }
+
+            //    //        if (switches[0] == GameControllerSwitchPosition.Right)
+            //    //        {
+            //    //            await communicator.SendCustomCommand("mcw_800");
+            //    //            Console.WriteLine("mcw");
+            //    //            isStopped = false;
+            //    //        }
+
+            //    //        if (switches[0] == GameControllerSwitchPosition.Left)
+            //    //        {
+            //    //            await communicator.SendCustomCommand("mccw");
+            //    //            Console.WriteLine("mccw");
+            //    //            isStopped = false;
+            //    //        }
+
+            //    //        previousHatPosition = switches[0];
+            //    //    }
+            //    //}
+            //}
+            //else
+            //{
+            //    if (!isStopped)
+            //    {
+            //        await communicator.SendCustomCommand("stop");
+            //        Console.WriteLine("Stopping");
+            //        isStopped = true;
+            //    }
+            //}
 
             // Small delay to prevent overwhelming the serial port
-            await Task.Delay(50);
+            await Task.Delay(42);
         }
+    }
+    static int BoolToInt(bool value)
+    {
+        return value ? 1 : 0;
     }
 
     static double MapAxisValue(double rawValue)
@@ -293,7 +438,7 @@ internal class Program
     // Event handlers for continuous data reception
     private static void OnDataReceived(object sender, string data)
     {
-        Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] << {data}\n");
+        Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] << {data}");
     }
 
     private static void OnErrorOccurred(object sender, string error)

@@ -199,7 +199,7 @@ public class RP2040SerialCommunicator
                 command += ">";
 
             await SendCommandAsync(command);
-            Console.WriteLine($"Custom command sent: {command.Trim()}");
+           // Console.WriteLine($"Custom command sent: {command.Trim()}");
             return true;
         }
         catch (Exception ex)
@@ -267,7 +267,16 @@ public class RP2040SerialCommunicator
                 {
                     byte[] data = Encoding.UTF8.GetBytes(command);
                     Console.WriteLine($"Data length sent:{data.Length}");
-                    _serialPort.Write(command);
+                    try
+                    {
+                        _serialPort.Write(command);
+                    }
+                    catch (Exception)
+                    {
+
+                        Console.WriteLine("ERROR: Failed to write!");
+                    }
+                    
                 }
             }
         });
@@ -313,7 +322,7 @@ public class RP2040SerialCommunicator
             {
                 // Regular data received
                 DataReceived?.Invoke(this, line);
-                Console.WriteLine($"Data received: {line}");
+                //Console.WriteLine($"Data received: {line}");
             }
         }
     }

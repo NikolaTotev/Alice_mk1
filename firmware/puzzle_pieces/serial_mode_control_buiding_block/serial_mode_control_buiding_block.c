@@ -28,10 +28,10 @@ int movement_speed = 800;
 
 // Built-in LED pin
 #define LED_PIN 25
-#define step_pin 4
-#define dir_pin 5
-#define driver_ena_pin 7
-#define shifter_ena_pin 8
+#define step_pin 15
+#define dir_pin 14
+// #define driver_ena_pin 7
+#define shifter_ena_pin 10
 
 const char *start_cmd = "start";
 const char *cli_opt = "cli";
@@ -57,19 +57,19 @@ int main()
     gpio_init(LED_PIN);
     gpio_init(step_pin);
     gpio_init(dir_pin);
-    gpio_init(driver_ena_pin);
+    // gpio_init(driver_ena_pin);
     gpio_init(shifter_ena_pin);
 
     gpio_set_dir(LED_PIN, GPIO_OUT);
     gpio_set_dir(step_pin, GPIO_OUT);
     gpio_set_dir(dir_pin, GPIO_OUT);
-    gpio_set_dir(driver_ena_pin, GPIO_OUT);
+    // gpio_set_dir(driver_ena_pin, GPIO_OUT);
     gpio_set_dir(shifter_ena_pin, GPIO_OUT);
 
     gpio_put(LED_PIN, false);
     gpio_put(step_pin, true);
     gpio_put(dir_pin, true);
-    gpio_put(driver_ena_pin, true);
+    // gpio_put(driver_ena_pin, true);
     gpio_put(shifter_ena_pin, true);
 
     // Wait for USB connection
