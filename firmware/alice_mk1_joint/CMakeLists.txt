@@ -50,6 +50,7 @@ target_link_libraries(alice_mk1_joint
         hardware_gpio
         pico_multicore
         pico_util
+        hardware_pwm
         pico_stdlib)
 
 # Add the standard include files to the build

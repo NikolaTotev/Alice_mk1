@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("serial_driver_building_block")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bce3ffc8326d383e7d68a217c1cd81813b98c109")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+42c0d82b61147123db2f54075b47af6f0beac250")]
 [assembly: System.Reflection.AssemblyProductAttribute("serial_driver_building_block")]
 [assembly: System.Reflection.AssemblyTitleAttribute("serial_driver_building_block")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

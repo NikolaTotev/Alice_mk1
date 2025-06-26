@@ -7,6 +7,9 @@
 #include "hardware/spi.h"
 #include "hardware/gpio.h"
 #include "hardware/irq.h"
+#include "pico/stdlib.h"
+#include "hardware/pwm.h"
+#include "hardware/clocks.h"
 
 // Your struct definition
 typedef struct
@@ -43,8 +46,17 @@ typedef struct
 
 // Queue to send data from core 0 to core 1
 queue_t joint_queue;
-#define pico_num 3
-#define motor_type 1 // 0 - small motor, 1 - big motor, 2 - servo
+#define pico_num 1
+#define motor_type 0 // 0 - small motor, 1 - big motor, 2 - servo
+
+uint16_t angle_to_duty(float angle)
+{
+    // Servo expects 1-2ms pulse width in 20ms period (50Hz)
+    // 1ms = 5% duty, 2ms = 10% duty at 50Hz
+    float pulse_width = 1.0f + (angle / 180.0f); // 1-2ms
+    float duty_cycle = pulse_width / 20.0f;      // Convert to duty cycle
+    return (uint16_t)(duty_cycle * 65535);       // 16-bit PWM resolution
+}
 
 // Core 1 main function
 void core1_main()
@@ -85,28 +97,88 @@ void core1_main()
 
     if (motor_type == 2)
     {
+        gpio_set_function(servo_1, GPIO_FUNC_PWM);
+        gpio_set_function(servo_2, GPIO_FUNC_PWM);
+        uint servo_slice_1 = pwm_gpio_to_slice_num(servo_1);
+        uint servo_slice_2 = pwm_gpio_to_slice_num(servo_2);
+
+        pwm_config config = pwm_get_default_config();
+
+        // Set PWM frequency to 50Hz
+        // Clock is 125MHz, we want 50Hz
+        // div = 125MHz / (50Hz * 65536) ≈ 38.15
+        pwm_config_set_clkdiv(&config, 38.15f);
+        pwm_config_set_wrap(&config, 65535); // 16-bit resolution
+
+        pwm_init(servo_slice_1, &config, true);
+        pwm_init(servo_slice_2, &config, true);
     }
 
     printf("Core 1 started, waiting for packets...\n");
+    float servo_1_angle = 90;
+    float servo_2_angle = 90;
+
+    uint16_t duty_1 = angle_to_duty(servo_1_angle);
+    pwm_set_gpio_level(servo_1, duty_1);
+
+    uint16_t duty_2 = angle_to_duty(servo_2_angle);
+    pwm_set_gpio_level(servo_2, duty_2);
 
     while (true)
     {
         // Wait for a packet from core 0
         if (queue_try_remove(&joint_queue, &received_packet))
         {
-            printf("PICO %lu >> Core 1 received: active=%d, dir=%d, dir2=%d, speed=%d\n",
+            printf("PICO %lu >> Core 1 received: active=%d, dir=%d, dir2=%d, speed=%d, s1=%f, s2=%f\n",
                    pico_num,
                    received_packet.active,
                    received_packet.direction,
                    received_packet.direction2,
-                   received_packet.speed);
+                   received_packet.speed,
+                   servo_1_angle, servo_2_angle);
         }
-        
 
         if (received_packet.active)
         {
             if (motor_type == 2)
             {
+                if (received_packet.speed != 0)
+                {
+                    if (received_packet.speed == 1)
+                    {
+                        if (servo_1_angle > 0)
+                        {
+                            servo_1_angle -= 0.0008;
+                        }
+                    }
+                    if (received_packet.speed == 2)
+                    {
+                        if (servo_1_angle < 250)
+                        {
+                            servo_1_angle += 0.0008;
+                        }
+                    }
+
+                    if (received_packet.speed == 3)
+                    {
+                        if (servo_2_angle > 0)
+                        {
+                            servo_2_angle -= 0.0008;
+                        }
+                    }
+                    if (received_packet.speed == 4)
+                    {
+                        if (servo_2_angle < 180)
+                        {
+                            servo_2_angle += 0.0008;
+                        }
+                    }
+
+                    uint16_t duty_1 = angle_to_duty(servo_1_angle);
+                    pwm_set_gpio_level(servo_1, duty_1);
+                    uint16_t duty_2 = angle_to_duty(servo_2_angle);
+                    pwm_set_gpio_level(servo_2, duty_2);
+                }
             }
             else
             {
@@ -130,17 +202,17 @@ int main()
     gpio_set_dir(LED_PIN, GPIO_OUT);
     gpio_put(LED_PIN, false);
 
-    while (!stdio_usb_connected())
-    {
-        gpio_put(LED_PIN, true);
-        sleep_ms(100);
-        gpio_put(LED_PIN, false);
-        sleep_ms(100);
-        gpio_put(LED_PIN, true);
-        sleep_ms(100);
-        gpio_put(LED_PIN, false);
-        sleep_ms(300);
-    }
+    // while (!stdio_usb_connected())
+    // {
+    //     gpio_put(LED_PIN, true);
+    //     sleep_ms(100);
+    //     gpio_put(LED_PIN, false);
+    //     sleep_ms(100);
+    //     gpio_put(LED_PIN, true);
+    //     sleep_ms(100);
+    //     gpio_put(LED_PIN, false);
+    //     sleep_ms(300);
+    // }
 
     printf("PICO %lu SPI Slave (SPI0) initialized\n", pico_num);
 

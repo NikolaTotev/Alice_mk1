@@ -34,8 +34,7 @@
               "RelativeToolTip": "serial_driver_building_block\\serial_driver_building_block.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-06-14T11:11:30.692Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-14T11:11:30.692Z"
             },
             {
               "$type": "Document",
@@ -47,8 +46,7 @@
               "RelativeToolTip": "serial_driver_building_block\\RP2040SerialCommunicator.cs",
               "ViewState": "AgIAAKMAAAAAAAAAAAAIwLIAAABcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-27T20:08:27.336Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-27T20:08:27.336Z"
             },
             {
               "$type": "Document",
@@ -56,9 +54,9 @@
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\User\\Documents\\GitHub\\Alice_mk1\\software\\serial_driver_building_block\\serial_driver_building_block\\Program.cs",
               "RelativeDocumentMoniker": "serial_driver_building_block\\Program.cs",
-              "ToolTip": "C:\\Users\\User\\Documents\\GitHub\\Alice_mk1\\software\\serial_driver_building_block\\serial_driver_building_block\\Program.cs*",
-              "RelativeToolTip": "serial_driver_building_block\\Program.cs*",
-              "ViewState": "AgIAABUBAAAAAAAAAAAmwCwBAAAeAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\User\\Documents\\GitHub\\Alice_mk1\\software\\serial_driver_building_block\\serial_driver_building_block\\Program.cs",
+              "RelativeToolTip": "serial_driver_building_block\\Program.cs",
+              "ViewState": "AgIAAFkBAAAAAAAAAAAmwGUBAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-27T19:10:32.959Z",
               "EditorCaption": ""

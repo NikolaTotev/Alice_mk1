@@ -48,6 +48,8 @@ pico_enable_stdio_usb(alice_master_node 1)
 target_link_libraries(alice_master_node
         hardware_spi
         hardware_gpio
+        hardware_pwm
+        pico_util
         pico_stdlib)
 
 # Add the standard include files to the build

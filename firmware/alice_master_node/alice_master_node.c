@@ -7,6 +7,8 @@
 #include "hardware/gpio.h"
 #include "pico/time.h"
 #include "hardware/spi.h"
+#include "hardware/pwm.h"
+#include "hardware/clocks.h"
 
 // Define the data structure to send
 typedef struct
@@ -19,6 +21,7 @@ typedef struct
     uint16_t joint_1_speed;
     uint16_t joint_2_speed;
     uint16_t joint_3_speed;
+    uint16_t servo_speed;
     bool stop;
     bool gripper_open;
 } RobotState;
@@ -45,13 +48,12 @@ typedef struct
 // counter control pins
 #define clk_pin 22
 #define rst_pin 21
+#define gripper 7
 
 // Frame format definitions (since they're not in the SDK)
 #define FRAME_FORMAT_MOTOROLA 0x0
 #define FRAME_FORMAT_TI 0x1
 #define FRAME_FORMAT_MICROWIRE 0x2
-
-#define Something "Something"
 
 // Configuration commands
 const char *start_cmd = "start";
@@ -73,6 +75,8 @@ bool serial_data_available = false;
 bool move_motor = false;
 int movement_speed = 800;
 RobotState state;
+int time_from_previoius_movement = 0;
+bool previous_state = false;
 
 void configure_pins();
 void configure_spi();
@@ -90,12 +94,35 @@ void update_speed(char *args_token);
 bool get_pi_input();
 bool stringAsBool(const char *str);
 
+uint16_t angle_to_duty(float angle)
+{
+    // Servo expects 1-2ms pulse width in 20ms period (50Hz)
+    // 1ms = 5% duty, 2ms = 10% duty at 50Hz
+    float pulse_width = 1.0f + (angle / 180.0f); // 1-2ms
+    float duty_cycle = pulse_width / 20.0f;      // Convert to duty cycle
+    return (uint16_t)(duty_cycle * 65535);       // 16-bit PWM resolution
+}
+
 int main()
 {
     configure_pins();
     configure_serial();
     configure_spi();
     configure_robot();
+
+    gpio_set_function(gripper, GPIO_FUNC_PWM);
+    uint gripper_slice = pwm_gpio_to_slice_num(gripper);
+    pwm_config config = pwm_get_default_config();
+
+    // Set PWM frequency to 50Hz
+    // Clock is 125MHz, we want 50Hz
+    // div = 125MHz / (50Hz * 65536) ≈ 38.15
+    pwm_config_set_clkdiv(&config, 38.15f);
+    pwm_config_set_wrap(&config, 65535); // 16-bit resolution
+
+    pwm_init(gripper_slice, &config, true);
+    uint16_t gripper_duty = angle_to_duty(70);
+    pwm_set_gpio_level(gripper, gripper_duty);
 
     while (running)
     {
@@ -140,7 +167,7 @@ int main()
                     tx_data.active = state.stop;
                     tx_data.direction = state.joint_4_dir;
                     tx_data.direction2 = state.joint_5_dir;
-                    tx_data.speed = 42;
+                    tx_data.speed = state.servo_speed;
                 }
 
                 // gpio_put(SPI0_CS, 0);
@@ -167,6 +194,25 @@ int main()
         gpio_put(rst_pin, false);
         gpio_put(LED_PIN, false);
         sleep_ms(1);
+
+        if (state.gripper_open != previous_state && time_from_previoius_movement > 100)
+        {
+            if (state.gripper_open)
+            {
+                uint16_t gripper_duty = angle_to_duty(175);
+                pwm_set_gpio_level(gripper, gripper_duty);
+                time_from_previoius_movement = 0;                
+            }
+            else
+            {
+                uint16_t gripper_duty = angle_to_duty(25);
+                pwm_set_gpio_level(gripper, gripper_duty);
+                time_from_previoius_movement = 0;
+            }
+            previous_state = state.gripper_open;
+        }
+
+        time_from_previoius_movement += 1;
 
         // if (counter < 4)
         // {
@@ -543,6 +589,14 @@ void process_update_state(const char *args_token)
         new_state.joint_3_speed = atoi(args); // +1 to skip the underscore
     }
 
+    args = strtok(NULL, "_");
+
+    if (args != NULL)
+    {
+        // printf("Joint 3 speed %s\n", args_token);
+        new_state.servo_speed = atoi(args); // +1 to skip the underscore
+    }
+
     // Gripper state  ====================================
     args = strtok(NULL, "_");
 
@@ -552,7 +606,7 @@ void process_update_state(const char *args_token)
         new_state.gripper_open = stringAsBool(args); // +1 to skip the underscore
     }
 
-    printf("New state Stop Flag: %d\n Directions: J1 %d, J2 %d, J3 %d, J4 %d, J5 %d\n Speeds: J1 %lu, J2 %lu, J3 %lu,\n Gripper: %d",
+    printf("New state Stop Flag: %d\n Directions: J1 %d, J2 %d, J3 %d, J4 %d, J5 %d\n Speeds: J1 %lu, J2 %lu, J3 %lu, S %lu\n Gripper: %d",
            new_state.stop,
            new_state.joint_1_dir,
            new_state.joint_2_dir,
@@ -563,6 +617,8 @@ void process_update_state(const char *args_token)
            new_state.joint_1_speed,
            new_state.joint_2_speed,
            new_state.joint_3_speed,
+
+           new_state.servo_speed,
 
            new_state.gripper_open);
 

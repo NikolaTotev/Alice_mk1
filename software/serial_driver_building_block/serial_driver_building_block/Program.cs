@@ -69,8 +69,9 @@
 
 using System.Net.WebSockets;
 using Windows.Gaming.Input;
+using Windows.Media.Core;
 public struct RobotState
-{ 
+{
     public int joint_1_dir;
     public int joint_2_dir;
     public int joint_3_dir;
@@ -79,6 +80,7 @@ public struct RobotState
     public int joint_1_speed;
     public int joint_2_speed;
     public int joint_3_speed;
+    public int servo_speed;
     public int stop;
     public int gripper_open;
 }
@@ -168,6 +170,8 @@ internal class Program
         var previousHatPosition = GameControllerSwitchPosition.Center;
         bool previous_gripper_position = false;
         bool isStopped = true;
+        DateTime lastGripperToggle = DateTime.MinValue;
+        int GRIPPER_DEBOUNCE_MS = 250; 
 
         while (true)
         {
@@ -191,30 +195,30 @@ internal class Program
 
 
             if (axes[0] >= 0.6)
-            {                
-                mapped_2 = MapAxisValue(axes[0]);             
+            {
+                mapped_2 = MapAxisValue(axes[0]);
             }
             else
-            {                
-                mapped_2 = MapAxisValueLeft(axes[0]);             
+            {
+                mapped_2 = MapAxisValueLeft(axes[0]);
             }
 
             if (axes[1] >= 0.6)
-            {                
+            {
                 mapped_3 = MapAxisValue(axes[1]);
             }
             else
-            {             
+            {
                 mapped_3 = MapAxisValueLeft(axes[1]);
             }
 
             if (axes[2] >= 0.6)
             {
-                mapped_1 = MapAxisValue(axes[2]);             
+                mapped_1 = MapAxisValue(axes[2]);
             }
             else
             {
-                mapped_1 = MapAxisValueLeft(axes[2]);                
+                mapped_1 = MapAxisValueLeft(axes[2]);
             }
 
             RobotState state = new RobotState();
@@ -222,8 +226,14 @@ internal class Program
             state.stop = Convert.ToInt32(buttons[0]);
             if (buttons[3])
             {
-                state.gripper_open = Convert.ToInt32(!previous_gripper_position);
-                previous_gripper_position = Convert.ToBoolean(state.gripper_open);
+                DateTime now = DateTime.Now;
+                if ((now - lastGripperToggle).TotalMilliseconds >= GRIPPER_DEBOUNCE_MS)
+                {
+                    state.gripper_open = Convert.ToInt32(!previous_gripper_position);
+                    previous_gripper_position = Convert.ToBoolean(state.gripper_open);
+                    lastGripperToggle = now;
+
+                }
             }
             else
             {
@@ -269,24 +279,37 @@ internal class Program
             if (switches[0] == GameControllerSwitchPosition.Down)
             {
                 state.joint_4_dir = Convert.ToInt32(false);
+                state.servo_speed = 1;
+
             }
 
             if (switches[0] == GameControllerSwitchPosition.Up)
             {
                 state.joint_4_dir = Convert.ToInt32(true);
+                state.servo_speed = 2;
+
             }
 
             if (switches[0] == GameControllerSwitchPosition.Right)
             {
                 state.joint_5_dir = Convert.ToInt32(true);
+                state.servo_speed = 3;
+
             }
 
             if (switches[0] == GameControllerSwitchPosition.Left)
             {
                 state.joint_5_dir = Convert.ToInt32(false);
+                state.servo_speed = 4;
+
             }
 
-            if(mapped_1 < 300 && mapped_1 != 0)
+            if (switches[0] == GameControllerSwitchPosition.Center)
+            {
+                state.servo_speed = 0;
+            }             
+
+            if (mapped_1 < 300 && mapped_1 != 0)
             {
                 mapped_1 = 300;
             }
@@ -316,6 +339,7 @@ internal class Program
                 $"{state.joint_1_speed}_" +
                 $"{state.joint_2_speed}_" +
                 $"{state.joint_3_speed}_" +
+                $"{state.servo_speed}_" +
                 $"{state.gripper_open}");
 
             Console.WriteLine($"SENT STATE IS: {state.stop}_" +
@@ -327,95 +351,8 @@ internal class Program
                 $"{state.joint_1_speed}_" +
                 $"{state.joint_2_speed}_" +
                 $"{state.joint_3_speed}_" +
+                $"{state.servo_speed}_" +
                 $"{state.gripper_open}");
-
-            // stop_dir1_dir2_dir3_dir4_dir5_speed1_speed2_speed3_gripper
-            //if (buttons[0])
-            //{
-            //    if (mapped == 0)
-            //    {
-            //        if (!isStopped)
-            //        {
-            //            await communicator.SendCustomCommand("stop");
-            //            Console.WriteLine("Stopping");
-            //            isStopped = true;
-            //        }
-            //    }
-
-            //    if (axes[0] >= 0.6)
-            //    {
-            //        if (isStopped)
-            //        {
-            //            await communicator.SendCustomCommand($"mcw_{Convert.ToInt32(mapped)}");
-            //            Console.WriteLine($"mcw_{Convert.ToInt32(mapped)}");
-            //            isStopped = false;
-            //        }
-            //        else
-            //        {
-            //            await communicator.SendCustomCommand($"update-speed_{Convert.ToInt32(mapped)}");
-            //            Console.WriteLine($"mcw_{Convert.ToInt32(mapped)}");
-            //        }
-
-            //    }
-
-            //    if (axes[0] <= 0.4)
-            //    {
-            //        if (isStopped)
-            //        {
-            //            await communicator.SendCustomCommand($"mccw_{Convert.ToInt32(mapped)}");
-            //            Console.WriteLine($"mccw_{Convert.ToInt32(mapped)}");
-            //            isStopped = false;
-            //        }
-
-            //        else
-            //        {
-            //            await communicator.SendCustomCommand($"update-speed_{Convert.ToInt32(mapped)}");
-            //            Console.WriteLine($"update-speed_{Convert.ToInt32(mapped)}");
-            //        }
-            //    }
-
-
-            //    //if (switches.Length > 0)
-            //    //{
-            //    //    var currentHatPosition = switches[0];
-
-            //    //    if (currentHatPosition != previousHatPosition)
-            //    //    {
-
-            //    //        if (switches[0] == GameControllerSwitchPosition.Center)
-            //    //        {
-            //    //            await communicator.SendCustomCommand("stop");
-            //    //            Console.WriteLine("Stopping");
-            //    //            isStopped = true;
-            //    //        }
-
-            //    //        if (switches[0] == GameControllerSwitchPosition.Right)
-            //    //        {
-            //    //            await communicator.SendCustomCommand("mcw_800");
-            //    //            Console.WriteLine("mcw");
-            //    //            isStopped = false;
-            //    //        }
-
-            //    //        if (switches[0] == GameControllerSwitchPosition.Left)
-            //    //        {
-            //    //            await communicator.SendCustomCommand("mccw");
-            //    //            Console.WriteLine("mccw");
-            //    //            isStopped = false;
-            //    //        }
-
-            //    //        previousHatPosition = switches[0];
-            //    //    }
-            //    //}
-            //}
-            //else
-            //{
-            //    if (!isStopped)
-            //    {
-            //        await communicator.SendCustomCommand("stop");
-            //        Console.WriteLine("Stopping");
-            //        isStopped = true;
-            //    }
-            //}
 
             // Small delay to prevent overwhelming the serial port
             await Task.Delay(42);
